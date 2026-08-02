@@ -8,8 +8,6 @@ assignees: ""
 
 ## Description
 
-## Description
-
 Clearly describe the problem.
 
 ## Expected Behavior
