@@ -1,0 +1,16 @@
+# Normalize text files and store them with LF line endings.
+* text=auto eol=lf
+
+# Preserve required Windows line endings for Windows scripts.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Treat common image and archive formats as binary.
+*.gif binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.pdf binary
+*.zip binary
