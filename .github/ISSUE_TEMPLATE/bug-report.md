@@ -1,11 +1,12 @@
 ---
-
 name: Bug report
 about: Report reproducible incorrect behavior in PulseForge
 title: "Bug: "
 labels: ""
 assignees: ""
--------------
+---
+
+## Description
 
 ## Description
 

@@ -1,11 +1,10 @@
 ---
-
 name: Lesson task
 about: Plan a focused PulseForge lesson with clear acceptance criteria
 title: "Lesson: "
 labels: ""
 assignees: ""
--------------
+---
 
 ## Objective
 
