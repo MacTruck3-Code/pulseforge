@@ -12,7 +12,7 @@ It is not intended to be a daily activity log. Entries should capture completed 
 | Completion issue | #1 — Establish repository foundation |
 | Completion Pull Request | #2 — Establish repository foundation |
 | Phase status | Complete |
-| Next phase | Phase 2 — Python Application Foundation |                          |
+| Next phase | Phase 2 — Python Application Foundation |
 
 ## Phase 1 — Repository Foundation
 
