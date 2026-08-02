@@ -8,8 +8,9 @@ The goal is not only to build a working application. Each phase is designed to d
 
 ## Current Status
 
-PulseForge is currently in **Phase 1: Repository Foundation**.
+PulseForge has completed **Phase 1: Repository Foundation**.
 
+Phase 2, the Python application foundation, has not yet started.
 The repository currently contains:
 
 * A protected `main` branch workflow
