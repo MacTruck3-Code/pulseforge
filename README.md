@@ -75,6 +75,37 @@ Direct pushes to `main` are not allowed.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete development workflow.
 
+## Local Development
+
+PulseForge requires Python 3.12 or newer.
+
+Create and select a project-local virtual environment using VS Code:
+
+1. Open the Command Palette.
+2. Run `Python: Create Environment`.
+3. Choose `Venv`.
+4. Name the environment `.venv`.
+5. Select a supported Python interpreter.
+6. Skip package installation when prompted.
+
+Install PulseForge in editable mode from the repository root:
+
+```bash
+python3 -m pip install --editable .
+```
+
+Run the application:
+```bash
+pulseforge
+```
+
+A successful run produces a log message similar to:
+```bash
+INFO pulseforge.main: PulseForge status: operational
+```
+
+The command should exit with status code 0.
+
 ## Repository Guide
 
 | Location                             | Purpose                                                                     |
