@@ -103,7 +103,7 @@ pulseforge
 
 A successful run produces a log message similar to:
 ```bash
-INFO pulseforge.main: PulseForge status: operational
+INFO pulseforge.app: PulseForge status: operational
 ```
 
 The command should exit with status code 0.
