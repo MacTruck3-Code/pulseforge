@@ -10,7 +10,7 @@ The goal is not only to build a working application. Each phase is designed to d
 
 PulseForge has completed **Phase 1: Repository Foundation**.
 
-Phase 2, the Python application foundation, has not yet started.
+**Phase 2: Python Application Foundation** is in progress.
 
 The repository currently contains:
 
@@ -22,7 +22,9 @@ The repository currently contains:
 * Pull Request and Issue templates
 * Repository formatting and file-handling rules
 
-PulseForge does not yet contain application code, containers, Kubernetes resources, Terraform configuration, or GitHub Actions workflows.
+PulseForge now contains a small Python command-line application foundation.
+
+Containers, Kubernetes resources, Terraform configuration, OpenTelemetry, Elastic integration, and GitHub Actions workflows have not yet been introduced.
 
 These capabilities will be introduced incrementally when they provide clear learning and engineering value.
 
