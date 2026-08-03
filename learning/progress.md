@@ -8,11 +8,11 @@ It is not intended to be a daily activity log. Entries should capture completed 
 
 | Area | Status |
 |---|---|
-| Most recently completed phase | Phase 1 — Repository Foundation |
-| Completion issue | #1 — Establish repository foundation |
-| Completion Pull Request | #2 — Establish repository foundation |
+| Most recently completed phase | Phase 2 — Python Application Foundation |
+| Completion issue | #3 — Build the Python application foundation |
+| Completion Pull Request | #4 — Build the Python application foundation |
 | Phase status | Complete |
-| Next phase | Phase 2 — Python Application Foundation |
+| Next phase | Phase 3 — Testing and Code Quality |
 
 ## Phase 1 — Repository Foundation
 
@@ -55,6 +55,58 @@ It is not intended to be a daily activity log. Entries should capture completed 
 * Connecting Pull Requests to issues.
 * Evaluating Pull Requests against acceptance criteria.
 * Keeping documentation accurate as the repository changes.
+
+## Phase 2 — Python Application Foundation
+
+### Completed
+
+* Created Issue #3 to define the Phase 2 scope and acceptance criteria.
+* Created a Python project using a `src` directory layout.
+* Added project metadata and package configuration with `pyproject.toml`.
+* Created a project-local Python virtual environment using VS Code.
+* Added an installable `pulseforge` command-line entry point.
+* Added support for running PulseForge with `python3 -m pulseforge`.
+* Added standard-library logging, type hints, and explicit exit codes.
+* Separated application logic, logging configuration, and startup handling into focused modules.
+* Documented local installation and execution steps.
+* Validated the application through both supported execution paths.
+
+### Concepts Reinforced
+
+* A module is a Python file, while a package groups related modules.
+* A `src` layout helps prevent accidental imports directly from the repository root.
+* `pyproject.toml` provides project metadata, build configuration, package discovery, and command-line entry points.
+* A virtual environment isolates project packages from the system Python environment.
+* Editable installation makes source changes immediately available without reinstalling after every edit.
+* `__main__.py` enables a package to run with `python3 -m pulseforge`.
+* Logging is more appropriate than `print()` for application operational messages.
+* Explicit exit codes communicate success or failure to calling processes.
+* Refactoring should improve structure without changing external behavior.
+
+### Decisions Made
+
+* PulseForge supports Python 3.12 or newer.
+* The application uses a `src` directory layout.
+* Setuptools is used as the initial build backend.
+* Runtime dependencies remain empty for the initial application foundation.
+* Python’s standard logging library is used instead of a third-party logging package.
+* Application logic, logging configuration, and process startup are kept in separate modules.
+* Package version duplication is temporarily accepted to avoid premature version-management tooling.
+
+### Challenges
+
+* The initial editable installation stopped resolving the package correctly.
+* Recreating the virtual environment provided a cleaner solution than introducing path workarounds.
+* A pushed commit message was corrected safely by amending the commit and using force push with lease.
+* Pull Request review identified outdated documentation and missing final newlines.
+
+### Areas to Reinforce
+
+* Understanding Python packaging and editable installations.
+* Distinguishing application errors from unexpected programming errors.
+* Writing maintainable Python modules as application behavior grows.
+* Reviewing documentation against actual application output.
+* Adding automated tests before expanding application behavior.
 
 ## Future Entries
 

@@ -10,7 +10,7 @@ The goal is not only to build a working application. Each phase is designed to d
 
 PulseForge has completed **Phase 1: Repository Foundation**.
 
-Phase 2, the Python application foundation, has not yet started.
+**Phase 2: Python Application Foundation** is in progress.
 
 The repository currently contains:
 
@@ -22,7 +22,9 @@ The repository currently contains:
 * Pull Request and Issue templates
 * Repository formatting and file-handling rules
 
-PulseForge does not yet contain application code, containers, Kubernetes resources, Terraform configuration, or GitHub Actions workflows.
+PulseForge now contains a small Python command-line application foundation.
+
+Containers, Kubernetes resources, Terraform configuration, OpenTelemetry, Elastic integration, and GitHub Actions workflows have not yet been introduced.
 
 These capabilities will be introduced incrementally when they provide clear learning and engineering value.
 
@@ -74,6 +76,37 @@ All project work follows this general workflow:
 Direct pushes to `main` are not allowed.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete development workflow.
+
+## Local Development
+
+PulseForge requires Python 3.12 or newer.
+
+Create and select a project-local virtual environment using VS Code:
+
+1. Open the Command Palette.
+2. Run `Python: Create Environment`.
+3. Choose `Venv`.
+4. Name the environment `.venv`.
+5. Select a supported Python interpreter.
+6. Skip package installation when prompted.
+
+Install PulseForge in editable mode from the repository root:
+
+```bash
+python3 -m pip install --editable .
+```
+
+Run the application:
+```bash
+pulseforge
+```
+
+A successful run produces a log message similar to:
+```bash
+INFO pulseforge.app: PulseForge status: operational
+```
+
+The command should exit with status code 0.
 
 ## Repository Guide
 
