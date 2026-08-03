@@ -2,21 +2,10 @@
 
 import logging
 
+from pulseforge.app import run
+from pulseforge.logging import configure_logging
+
 LOGGER = logging.getLogger(__name__)
-
-
-def configure_logging() -> None:
-    """Configure application logging."""
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-    )
-
-
-def run() -> int:
-    """Run the PulseForge application logic."""
-    LOGGER.info("PulseForge status: operational")
-    return 0
 
 
 def main() -> None:
