@@ -18,6 +18,7 @@ def test_main_exits_with_application_exit_code() -> None:
 
     assert exit_info.value.code == 7
 
+
 def test_main_exits_with_failure_when_runtime_error_occurs() -> None:
     """Verify that expected runtime errors produce a failure exit code."""
     with (

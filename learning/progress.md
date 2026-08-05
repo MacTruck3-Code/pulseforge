@@ -9,10 +9,10 @@ It is not intended to be a daily activity log. Entries should capture completed 
 | Area | Status |
 |---|---|
 | Most recently completed phase | Phase 2 — Python Application Foundation |
-| Completion issue | #3 — Build the Python application foundation |
-| Completion Pull Request | #4 — Build the Python application foundation |
-| Phase status | Complete |
-| Next phase | Phase 3 — Testing and Code Quality |
+| Current phase | Phase 3 — Testing and Code Quality |
+| Current issue | #5 — Establish testing and code quality |
+| Phase status | In progress |
+| Next phase | Phase 4 — Containerization |
 
 ## Phase 1 — Repository Foundation
 
@@ -107,6 +107,64 @@ It is not intended to be a daily activity log. Entries should capture completed 
 * Writing maintainable Python modules as application behavior grows.
 * Reviewing documentation against actual application output.
 * Adding automated tests before expanding application behavior.
+
+## Phase 3 — Testing and Code Quality
+
+### In Progress
+
+* Created Issue #5 to define the Phase 3 scope and acceptance criteria.
+* Added pytest as a development dependency.
+* Configured pytest discovery through `pyproject.toml`.
+* Created a focused unit-test structure under `tests/`.
+* Added unit tests for application behavior and startup handling.
+* Used pytest fixtures to capture application log records.
+* Used standard-library mocking to isolate startup dependencies and error paths.
+* Added Ruff for automated formatting and linting.
+* Configured Ruff through `pyproject.toml`.
+* Documented the local testing and quality-check workflow.
+
+### Concepts Reinforced
+
+* Unit tests validate small pieces of behavior in isolation.
+* The testing pyramid favors a larger number of fast unit tests and fewer expensive higher-level tests.
+* pytest discovers tests through predictable file and function naming conventions.
+* Test names should describe the behavior being verified.
+* Tests should be independent and should not rely on execution order.
+* Fixtures provide temporary support and controlled state for tests.
+* `patch()` temporarily replaces a dependency where the code under test looks it up.
+* `return_value` controls what a mock returns.
+* `side_effect` can make a mock raise a controlled exception.
+* Formatters standardize code layout automatically.
+* Linters identify potential code-quality problems.
+* Tests, formatting, and linting solve different engineering problems.
+
+### Decisions Made
+
+* pytest is used as the unit-testing framework.
+* Tests use a flat `tests/` directory while the application remains small.
+* pytest configuration is stored in `pyproject.toml`.
+* The `src` directory is explicitly included in pytest’s import path.
+* Ruff is used for both formatting and linting.
+* Ruff’s default lint rules are extended with import-order checks.
+* Testability improvements will not be made unless existing code boundaries require them.
+* Coverage enforcement, pre-commit hooks, and CI automation remain deferred.
+
+### Challenges
+
+* The existing editable virtual-environment installation initially failed to resolve the PulseForge package.
+* pytest required an explicit `src` import path in the project configuration.
+* The first logging test failed because INFO-level records were filtered by the default logging level.
+* The test was corrected by configuring the `caplog` fixture for the application logger.
+* Ruff exposed an incorrect TOML table boundary in `pyproject.toml`.
+
+### Areas to Reinforce
+
+* Distinguishing unit tests from integration and end-to-end tests.
+* Identifying the single behavior that each test should verify.
+* Understanding where dependencies must be patched.
+* Choosing when mocking improves isolation and when it adds unnecessary complexity.
+* Reviewing formatter changes separately from behavioral changes.
+* Running all quality checks before opening a Pull Request.
 
 ## Future Entries
 

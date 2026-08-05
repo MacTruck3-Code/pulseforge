@@ -8,9 +8,9 @@ The goal is not only to build a working application. Each phase is designed to d
 
 ## Current Status
 
-PulseForge has completed **Phase 1: Repository Foundation**.
+PulseForge has completed **Phase 2: Python Application Foundation**.
 
-**Phase 2: Python Application Foundation** is in progress.
+**Phase 3: Testing and Code Quality** is in progress.
 
 The repository currently contains:
 
@@ -93,7 +93,7 @@ Create and select a project-local virtual environment using VS Code:
 Install PulseForge in editable mode from the repository root:
 
 ```bash
-python3 -m pip install --editable .
+python3 -m pip install --editable ".[dev]"
 ```
 
 Run the application:
@@ -107,6 +107,36 @@ INFO pulseforge.app: PulseForge status: operational
 ```
 
 The command should exit with status code 0.
+
+## Local Quality Checks
+
+Run the unit tests:
+```bash
+python3 -m pytest
+```
+
+Check whether the Python files follow the configured formatting rules:
+
+```bash
+python3 -m ruff format --check .
+```
+
+Apply Ruff formatting when changes are required:
+```bash
+python3 -m ruff format .
+```
+
+Run static analysis and linting:
+```bash
+python3 -m ruff check .
+```
+
+Before opening a Pull Request, verify that tests, formatting, and linting all pass:
+```bash
+python3 -m pytest
+python3 -m ruff format --check .
+python3 -m ruff check .
+```
 
 ## Repository Guide
 
