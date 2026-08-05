@@ -132,7 +132,7 @@ Elastic Stack
 
 The application may later run in Kubernetes, with infrastructure managed through Terraform and application deployment packaged through Helm.
 
-This diagram represents direction only. These components have not yet been implemented.
+This diagram represents the intended future system context. The PulseForge application exists today, while OpenTelemetry instrumentation, telemetry collection, Elastic integration, and the supporting deployment infrastructure have not yet been implemented.
 
 ## Deferred Decisions
 

@@ -35,8 +35,7 @@ Purpose:
 
 * Run automated tests
 * Check formatting
-* Run linting
-* Perform type checking
+* Run linting and static analysis
 
 Add when:
 
