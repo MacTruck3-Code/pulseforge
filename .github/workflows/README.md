@@ -2,7 +2,9 @@
 
 This directory will contain GitHub Actions workflows for PulseForge.
 
-No workflows are implemented during Phase 1 because the repository does not yet contain application code, tests, container builds, infrastructure code, or deployment processes to validate.
+No automated workflows are currently implemented.
+
+PulseForge now has a Python application, pytest unit tests, and Ruff formatting and linting checks that run locally. GitHub Actions is intentionally deferred until **Phase 5: Continuous Integration**, after the application has been containerized and the local container workflow is understood.
 
 Automation will be introduced only after the corresponding manual process is understood and can be performed successfully.
 
@@ -23,6 +25,12 @@ Add when:
 
 ### Python Validation
 
+Current local validation:
+
+* Run unit tests with pytest
+* Check formatting with Ruff
+* Run linting and static analysis with Ruff
+
 Purpose:
 
 * Run automated tests
@@ -32,9 +40,10 @@ Purpose:
 
 Add when:
 
-* The Python application exists
-* Testing and code-quality tools have been selected
-* All checks work locally
+* Phase 5: Continuous Integration begins
+* The Phase 4 container workflow works locally
+* The exact automated validation scope has been reviewed
+* Any additional checks are first established locally
 
 ### Container Validation
 

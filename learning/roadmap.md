@@ -45,7 +45,7 @@ Focus:
 * Test structure
 * Formatting
 * Linting
-* Type checking
+* Static analysis
 * Local validation workflow
 
 Outcome:

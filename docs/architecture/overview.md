@@ -10,16 +10,21 @@ This document describes the current architectural direction. Planned components 
 
 ## Current State
 
-PulseForge is currently in the repository-foundation phase.
+PulseForge has completed **Phase 3: Testing and Code Quality**.
+
+**Phase 4: Containerization** is next.
 
 The repository currently contains:
 
-* Project documentation
-* Contribution guidelines
-* AI collaboration guidelines
+* Project, architecture, and learning documentation
+* Contribution and AI collaboration guidelines
 * A protected-branch development workflow
+* A Python 3.12 or newer command-line application under `src/pulseforge/`
+* Project metadata and development dependencies in `pyproject.toml`
+* Unit tests under `tests/`
+* Local testing, formatting, and linting with pytest and Ruff
 
-PulseForge does not yet contain application code, infrastructure code, deployment configuration, or automated CI/CD workflows.
+PulseForge does not yet contain a container image, Kubernetes resources, Helm charts, Terraform configuration, OpenTelemetry instrumentation, Elastic integration, or automated GitHub Actions workflows.
 
 ## Architectural Principles
 
@@ -61,15 +66,23 @@ The project should not imitate production complexity without a clear reason.
 
 PulseForge is expected to evolve through several stages.
 
-### Application Foundation
+### Application Foundation — Implemented
 
-A small Python service will provide the initial application behavior.
+PulseForge includes a small Python command-line application.
 
-The exact framework and application boundaries have not yet been selected.
+The application can run through the installed `pulseforge` command or with `python3 -m pulseforge`.
 
-### Testing and Code Quality
+Application logic, logging configuration, and process startup are separated into focused modules.
 
-Automated tests, formatting, linting, and dependency management will be introduced alongside the application.
+A web framework, broader feature set, and domain model have not yet been selected.
+
+### Testing and Code Quality — Implemented
+
+PulseForge uses pytest for focused unit testing.
+
+Ruff provides automated formatting, linting, import-order validation, and basic static analysis.
+
+These checks currently run locally before a Pull Request is opened. Automated execution through GitHub Actions is planned for Phase 5.
 
 ### Containerization
 
