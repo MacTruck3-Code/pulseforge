@@ -21,6 +21,9 @@ The repository currently contains:
 * A learning roadmap and progress tracker
 * Pull Request and Issue templates
 * Repository formatting and file-handling rules
+* A Python command-line application
+* Automated unit tests with pytest
+* Local formatting and linting with Ruff
 
 PulseForge now contains a small Python command-line application foundation.
 
@@ -148,8 +151,10 @@ python3 -m ruff check .
 | [`AGENTS.md`](AGENTS.md)             | Instructions for AI assistants collaborating on the project                 |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution and development workflow                                       |
 | [`LICENSE`](LICENSE)                 | Project license                                                             |
+| [`src/pulseforge/`](src/pulseforge/) | Python application package                                                  |
+| [`tests/`](tests/)                   | Automated unit tests                                                        |
 
-Application and infrastructure directories will be added when their corresponding phases begin.
+Container, deployment, and infrastructure directories will be added when their corresponding phases begin.
 
 ## Architecture
 
