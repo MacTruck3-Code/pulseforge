@@ -215,8 +215,8 @@ The following practices apply throughout the roadmap:
 | Phase                                   | Status      |
 | --------------------------------------- | ----------- |
 | Phase 1 — Repository Foundation         | Complete    |
-| Phase 2 — Python Application Foundation | Not started |
-| Phase 3 — Testing and Code Quality      | Not started |
+| Phase 2 — Python Application Foundation | Complete    |
+| Phase 3 — Testing and Code Quality      | Complete    |
 | Phase 4 — Containerization              | Not started |
 | Phase 5 — Continuous Integration        | Not started |
 | Phase 6 — Kubernetes Fundamentals       | Not started |
