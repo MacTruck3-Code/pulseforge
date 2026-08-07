@@ -10,7 +10,7 @@ The goal is not only to build a working application. Each phase is designed to d
 
 PulseForge has completed **Phase 3: Testing and Code Quality**.
 
-**Phase 4: Containerization** is next.
+**Phase 4: Containerization** is currently in progress.
 
 The repository currently contains:
 
@@ -24,10 +24,14 @@ The repository currently contains:
 * A Python command-line application
 * Automated unit tests with pytest
 * Local formatting and linting with Ruff
+* A locally buildable Docker image
+* A dedicated non-root container runtime user
 
 PulseForge now contains a small Python command-line application foundation.
 
-Containers, Kubernetes resources, Terraform configuration, OpenTelemetry, Elastic integration, and GitHub Actions workflows have not yet been introduced.
+Local container build and execution are now implemented as part of Phase 4.
+
+Kubernetes resources, Terraform configuration, OpenTelemetry, Elastic integration, container image publishing, and GitHub Actions workflows have not yet been introduced.
 
 These capabilities will be introduced incrementally when they provide clear learning and engineering value.
 
@@ -141,6 +145,53 @@ python3 -m ruff format --check .
 python3 -m ruff check .
 ```
 
+## Local Container Workflow
+
+PulseForge can be built and run locally as a Docker container.
+
+The container uses an official Python 3.12 slim base image, installs PulseForge using its existing Python package configuration, and runs the application as a dedicated non-root user.
+
+Build the image from the repository root:
+
+```bash
+docker build --tag pulseforge:phase4 .
+```
+
+Run PulseForge:
+```bash
+docker run --rm pulseforge:phase4
+```
+
+A successful container run produces a log message similar to:
+```bash
+INFO pulseforge.app: PulseForge status: operational
+```
+The container should exit with status code `0`.
+
+Verify the exit code:
+```bash
+docker run --rm pulseforge:phase4
+echo $?
+```
+
+Verify that the container runs as a non-root user:
+```bash
+docker run --rm \
+  --entrypoint id \
+  pulseforge:phase4
+```
+The reported UID must not be `0`.
+
+Inspect the configured container process and runtime user:
+```bash
+docker image inspect pulseforge:phase4 \
+  --format 'User={{json .Config.User}} Entrypoint={{json .Config.Entrypoint}} Cmd={{json .Config.Cmd}}'
+```
+
+The Docker workflow is currently local only.
+
+Container image publishing, automated image validation, vulnerability scanning, and continuous integration are deferred to Phase 5. Kubernetes deployment begins in Phase 6.
+
 ## Repository Guide
 
 | Location                             | Purpose                                                                     |
@@ -154,7 +205,7 @@ python3 -m ruff check .
 | [`src/pulseforge/`](src/pulseforge/) | Python application package                                                  |
 | [`tests/`](tests/)                   | Automated unit tests                                                        |
 
-Container, deployment, and infrastructure directories will be added when their corresponding phases begin.
+Containerization currently uses the root-level `Dockerfile` and `.dockerignore`. Deployment and infrastructure directories will be added only when their corresponding phases require them.
 
 ## Architecture
 

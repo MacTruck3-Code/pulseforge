@@ -166,6 +166,58 @@ It is not intended to be a daily activity log. Entries should capture completed 
 * Reviewing formatter changes separately from behavioral changes.
 * Running all quality checks before opening a Pull Request.
 
+## Phase 4 — Containerization
+
+### In Progress
+
+* Created Issue #10 to define the Phase 4 scope and acceptance criteria.
+* Established a Linux-based Docker development environment on a remote Ubuntu VM.
+* Added a Dockerfile using the official Python 3.12 slim base image.
+* Added a `.dockerignore` to exclude local development artifacts from the Docker build context.
+* Installed PulseForge into the image through its existing `pyproject.toml` package configuration.
+* Configured the installed `pulseforge` command as the container entry point.
+* Created a dedicated non-root user for the runtime process.
+* Verified the container emits the expected operational log and exits with status code `0`.
+* Verified the runtime process uses a nonzero UID and GID.
+* Inspected image layers and final image contents.
+* Confirmed pytest and Ruff validation still pass in the local development environment.
+
+### Concepts Reinforced
+
+* A container image is an immutable template used to create running containers.
+* A Dockerfile describes how an image is constructed one instruction at a time.
+* Dockerfile instructions contribute filesystem layers or image metadata.
+* The Docker build context determines which local files are available to the build.
+* `.dockerignore` reduces unnecessary build context and helps prevent local development artifacts from entering builds.
+* Build-time requirements and runtime requirements should be treated separately.
+* Installing PulseForge as a package validates the same packaging model used outside the container.
+* `ENTRYPOINT` defines the primary container executable, while `CMD` can provide default arguments or commands.
+* Exec-form process instructions avoid an unnecessary shell and provide better signal handling.
+* Containers should use the least privilege required by the application.
+* A named non-root user can be verified both through image metadata and the runtime numeric UID.
+* Image inspection and container execution validate different aspects of the artifact.
+
+### Decisions Made
+
+* PulseForge uses the official `python:3.12-slim` base image for Phase 4.
+* The Python minor version is pinned while immutable digest pinning is deferred.
+* Development dependencies such as pytest and Ruff are not installed in the runtime image.
+* PulseForge is installed through `pyproject.toml` rather than executed directly from the copied source tree.
+* The runtime process uses a dedicated `pulseforge` system user.
+* The image uses exec-form `ENTRYPOINT ["pulseforge"]`.
+* Setting PulseForge's `ENTRYPOINT` resets the base image's inherited `CMD`, so no additional `CMD` instruction is required.
+* Tests remain part of local validation rather than the runtime image.
+* Multi-stage builds are deferred because they do not currently provide enough value to justify the additional complexity.
+* Container builds and execution remain local only during Phase 4.
+
+### Areas to Reinforce
+
+* Understanding how Docker build cache invalidation changes as runtime dependencies are added.
+* Distinguishing build context contents from final image contents.
+* Understanding `ENTRYPOINT` and `CMD` interaction with command-line arguments.
+* Evaluating when stronger image pinning provides enough value to justify maintenance overhead.
+* Automating the established manual validation workflow during Phase 5.
+
 ## Future Entries
 
 Add a new section after each completed phase or major lesson.

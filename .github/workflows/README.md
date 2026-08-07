@@ -46,17 +46,26 @@ Add when:
 
 ### Container Validation
 
+Current local validation:
+
+* Build the PulseForge container image.
+* Run the container and verify the expected operational log.
+* Verify successful execution returns exit code `0`.
+* Verify the runtime process uses a non-root user.
+* Inspect the image for obvious unnecessary local files.
+
 Purpose:
 
-* Build the application container image
-* Validate the Dockerfile
-* Scan the image for known vulnerabilities
-* Confirm the container starts successfully
+* Build the application container image automatically.
+* Validate that the container starts successfully.
+* Verify important container security expectations.
+* Scan the image for known vulnerabilities.
 
 Add when:
 
-* The application has been containerized
-* The local container build is reliable
+* Phase 5: Continuous Integration begins.
+* The existing local container validation steps have been reviewed for automation.
+* A container scanning tool has been selected and evaluated locally where practical.
 
 ### Kubernetes Validation
 
