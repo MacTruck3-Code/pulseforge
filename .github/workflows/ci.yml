@@ -42,5 +42,8 @@ jobs:
       - name: Build container image
         run: docker build --tag pulseforge:ci .
 
-      - name: Run container
-        run: docker run --rm pulseforge:ci
+      - name: Validate container behavior
+        run: |
+          output="$(docker run --rm pulseforge:ci 2>&1)"
+          printf '%s\n' "$output"
+          grep -Fq "PulseForge status: operational" <<< "$output"
