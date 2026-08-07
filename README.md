@@ -31,7 +31,7 @@ PulseForge now contains a small Python command-line application foundation.
 
 Local container build and execution are now implemented as part of Phase 4.
 
-Kubernetes resources, Terraform configuration, OpenTelemetry, Elastic integration, container image publishing, and Github Actions workflows have not yet been introduced.
+Kubernetes resources, Terraform configuration, OpenTelemetry, Elastic integration, container image publishing, and GitHub Actions workflows have not yet been introduced.
 
 These capabilities will be introduced incrementally when they provide clear learning and engineering value.
 
