@@ -4,7 +4,9 @@ This directory will contain GitHub Actions workflows for PulseForge.
 
 No automated workflows are currently implemented.
 
-PulseForge now has a Python application, pytest unit tests, and Ruff formatting and linting checks that run locally. GitHub Actions is intentionally deferred until **Phase 5: Continuous Integration**, after the application has been containerized and the local container workflow is understood.
+PulseForge now has a Python application, pytest unit tests, Ruff formatting and linting checks, and a validated local container workflow.
+
+**Phase 4: Containerization** is complete. **Phase 5: Continuous Integration** is next and will begin automating the validation processes that have already been established locally.
 
 Automation will be introduced only after the corresponding manual process is understood and can be performed successfully.
 

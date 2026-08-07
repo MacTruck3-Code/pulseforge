@@ -10,9 +10,9 @@ This document describes the current architectural direction. Planned components 
 
 ## Current State
 
-PulseForge has completed **Phase 3: Testing and Code Quality**.
+PulseForge has completed **Phase 4: Containerization**.
 
-**Phase 4: Containerization** is currently in progress.
+**Phase 5: Continuous Integration** is next.
 
 The repository currently contains:
 
@@ -86,7 +86,7 @@ Ruff provides automated formatting, linting, import-order validation, and basic 
 
 These checks currently run locally before a Pull Request is opened. Automated execution through GitHub Actions is planned for Phase 5.
 
-### Containerization — In Progress
+### Containerization — Implemented
 
 PulseForge can be built locally as a Docker image using an official Python 3.12 slim base image.
 

@@ -8,11 +8,11 @@ It is not intended to be a daily activity log. Entries should capture completed 
 
 | Area | Status |
 |---|---|
-| Most recently completed phase | Phase 3 — Testing and Code Quality |
-| Completion issue | #5 — Establish testing and code quality |
-| Completion Pull Request | #6 — Establish testing and code quality |
+| Most recently completed phase | Phase 4 — Containerization |
+| Completion issue | #10 — Containerize the PulseForge application |
+| Completion Pull Request | #11 — Containerize the PulseForge application |
 | Phase status | Complete |
-| Next phase | Phase 4 — Containerization |
+| Next phase | Phase 5 — Continuous Integration |
 
 ## Phase 1 — Repository Foundation
 
@@ -168,7 +168,7 @@ It is not intended to be a daily activity log. Entries should capture completed 
 
 ## Phase 4 — Containerization
 
-### In Progress
+### Completed
 
 * Created Issue #10 to define the Phase 4 scope and acceptance criteria.
 * Established a Linux-based Docker development environment on a remote Ubuntu VM.
@@ -181,6 +181,11 @@ It is not intended to be a daily activity log. Entries should capture completed 
 * Verified the runtime process uses a nonzero UID and GID.
 * Inspected image layers and final image contents.
 * Confirmed pytest and Ruff validation still pass in the local development environment.
+* Verified pytest and Ruff are not installed in the runtime image.
+* Practiced creating, running, stopping, and removing a container while preserving the reusable image.
+* Confirmed that setting PulseForge's `ENTRYPOINT` resets the inherited base-image `CMD`.
+* Completed final documentation and Pull Request review before merging PR #11.
+* Merged PR #11, which closed Issue #10 and completed Phase 4.
 
 ### Concepts Reinforced
 
@@ -196,6 +201,9 @@ It is not intended to be a daily activity log. Entries should capture completed 
 * Containers should use the least privilege required by the application.
 * A named non-root user can be verified both through image metadata and the runtime numeric UID.
 * Image inspection and container execution validate different aspects of the artifact.
+* Images persist independently from individual containers created from them.
+* Stopping a container does not remove it; `docker rm` removes a stopped container, while `docker run --rm` automates cleanup after exit.
+* Docker build cache can reuse unchanged layers and significantly reduce rebuild work.
 
 ### Decisions Made
 
@@ -208,7 +216,8 @@ It is not intended to be a daily activity log. Entries should capture completed 
 * Setting PulseForge's `ENTRYPOINT` resets the base image's inherited `CMD`, so no additional `CMD` instruction is required.
 * Tests remain part of local validation rather than the runtime image.
 * Multi-stage builds are deferred because they do not currently provide enough value to justify the additional complexity.
-* Container builds and execution remain local only during Phase 4.
+* Container builds and execution remained local only during Phase 4; automation is deferred to Phase 5.
+
 
 ### Areas to Reinforce
 
