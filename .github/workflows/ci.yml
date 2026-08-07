@@ -28,3 +28,6 @@ jobs:
       
       - name: Check formatting
         run: python3 -m ruff format --check .
+
+      - name: Run linting
+        run: python3 -m ruff check .
