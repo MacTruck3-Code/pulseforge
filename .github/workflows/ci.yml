@@ -47,3 +47,9 @@ jobs:
           output="$(docker run --rm pulseforge:ci 2>&1)"
           printf '%s\n' "$output"
           grep -Fq "PulseForge status: operational" <<< "$output"
+
+      - name: Validate non-root user
+        run: |
+          user_id="$(docker run --rm --entrypoint id pulseforge:ci -u)"
+          printf 'Container UID: %s\n' "$user_id"
+          test "$user_id" -ne 0
