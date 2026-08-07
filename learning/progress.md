@@ -205,8 +205,7 @@ It is not intended to be a daily activity log. Entries should capture completed 
 * PulseForge is installed through `pyproject.toml` rather than executed directly from the copied source tree.
 * The runtime process uses a dedicated `pulseforge` system user.
 * The image uses exec-form `ENTRYPOINT ["pulseforge"]`.
-* The inherited Python image command is explicitly cleared.
-* Tests remain part of local validation rather than the runtime image.
+* Setting PulseForge's `ENTRYPOINT` resets the base image's inherited `CMD`, so no additional `CMD` instruction is required.* Tests remain part of local validation rather than the runtime image.
 * Multi-stage builds are deferred because they do not currently provide enough value to justify the additional complexity.
 * Container builds and execution remain local only during Phase 4.
 
