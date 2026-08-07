@@ -53,3 +53,13 @@ jobs:
           user_id="$(docker run --rm --entrypoint id pulseforge:ci -u)"
           printf 'Container UID: %s\n' "$user_id"
           test "$user_id" -ne 0
+
+      - name: Scan container vulnerabilities
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: "pulseforge:ci"
+          format: "table"
+          vuln-type: "os,library"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
+          cache: "false"
