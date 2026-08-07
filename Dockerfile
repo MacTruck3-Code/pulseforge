@@ -12,3 +12,4 @@ RUN python -m pip install --no-cache-dir . \
 USER pulseforge
 
 ENTRYPOINT ["pulseforge"]
+CMD []
