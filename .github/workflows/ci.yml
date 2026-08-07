@@ -59,6 +59,7 @@ jobs:
         with:
           image-ref: "pulseforge:ci"
           format: "table"
+          scanners: "vuln"
           vuln-type: "os,library"
           severity: "HIGH,CRITICAL"
           exit-code: "0"
