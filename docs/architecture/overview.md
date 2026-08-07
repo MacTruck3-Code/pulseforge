@@ -23,8 +23,10 @@ The repository currently contains:
 * Project metadata and development dependencies in `pyproject.toml`
 * Unit tests under `tests/`
 * Local testing, formatting, and linting with pytest and Ruff
+* A locally buildable Docker image for the PulseForge application
+* A dedicated non-root runtime user inside the container
 
-PulseForge does not yet contain a container image, Kubernetes resources, Helm charts, Terraform configuration, OpenTelemetry instrumentation, Elastic integration, or automated GitHub Actions workflows.
+PulseForge now has a locally buildable container image. It does not yet contain Kubernetes resources, Helm charts, Terraform configuration, OpenTelemetry instrumentation, Elastic integration, a published container image, or automated GitHub Actions workflows.
 
 ## Architectural Principles
 
@@ -84,9 +86,19 @@ Ruff provides automated formatting, linting, import-order validation, and basic 
 
 These checks currently run locally before a Pull Request is opened. Automated execution through GitHub Actions is planned for Phase 5.
 
-### Containerization
+### Containerization — Implemented
 
-The application will be packaged as a container after it functions locally and has basic automated tests.
+PulseForge can be built locally as a Docker image using an official Python 3.12 slim base image.
+
+The image installs PulseForge through its existing Python package configuration and uses the installed `pulseforge` command as the container process.
+
+The runtime process executes as a dedicated non-root user.
+
+The image intentionally contains only the files needed to install and run the application. Development tools such as pytest and Ruff remain part of the local development environment rather than the runtime image.
+
+Container builds and execution are currently local only. Image publishing, automated image validation, vulnerability scanning, and registry selection remain deferred.
+
+Kubernetes deployment begins in Phase 6 after the local container workflow and continuous integration process have been established.
 
 ### Kubernetes
 
@@ -149,6 +161,8 @@ The following decisions are intentionally deferred:
 * OpenTelemetry Collector topology
 * Elastic deployment model
 * CI/CD workflow design
+* Container image publishing and versioning strategy
+* Automated container vulnerability scanning
 
 These decisions will be made when the project has enough requirements to evaluate meaningful trade-offs.
 

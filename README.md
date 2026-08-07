@@ -141,6 +141,50 @@ python3 -m ruff format --check .
 python3 -m ruff check .
 ```
 
+## Local Container Workflow
+
+PulseForge can be built and run locally as a Docker container.
+
+The container uses an official Python 3.12 slim base image, installs PulseForge using its existing Python package configuration, and runs the application as a dedicated non-root user.
+
+Build the image from the repository root:
+
+```bash
+docker build --tag pulseforge:phase4 .
+```
+
+Run PulseForge:
+```bash
+docker run --rm pulseforge:phase4
+```
+
+A successful container run produces a log message similar to:
+```bash
+INFO pulseforge.app: PulseForge status: operational
+```
+The container should exit with status code `0`.
+
+Verify the exit code:
+```bash
+docker run --rm pulseforge:phase4
+echo $?
+```
+
+Verify that the container runs as a non-root user:
+```bash
+docker run --rm \
+  --entrypoint id \
+  pulseforge:phase4
+```
+The reported UID must not be `0`.
+
+Inspect the configured container process and runtime user:
+```bash
+docker image inspect pulseforge:phase4 \
+  --format 'User={{json .Config.User}} Entrypoint={{json .Config.Entrypoint}} Cmd={{json .Config.Cmd}}'
+```
+
+
 ## Repository Guide
 
 | Location                             | Purpose                                                                     |
