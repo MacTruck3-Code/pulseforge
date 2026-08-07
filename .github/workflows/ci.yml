@@ -28,7 +28,7 @@ jobs:
 
       - name: Run unit tests
         run: python3 -m pytest
-      
+
       - name: Check formatting
         run: python3 -m ruff format --check .
 
