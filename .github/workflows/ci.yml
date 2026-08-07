@@ -63,4 +63,4 @@ jobs:
           vuln-type: "os,library"
           severity: "HIGH,CRITICAL"
           exit-code: "0"
-          cache: "false"
+          cache: "true"
