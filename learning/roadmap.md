@@ -217,7 +217,7 @@ The following practices apply throughout the roadmap:
 | Phase 1 — Repository Foundation         | Complete    |
 | Phase 2 — Python Application Foundation | Complete    |
 | Phase 3 — Testing and Code Quality      | Complete    |
-| Phase 4 — Containerization              | Not started |
+| Phase 4 — Containerization              | Complete    |
 | Phase 5 — Continuous Integration        | Not started |
 | Phase 6 — Kubernetes Fundamentals       | Not started |
 | Phase 7 — Helm                          | Not started |
