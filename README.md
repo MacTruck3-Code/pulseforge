@@ -10,7 +10,7 @@ The goal is not only to build a working application. Each phase is designed to d
 
 PulseForge has completed **Phase 3: Testing and Code Quality**.
 
-**Phase 4: Containerization** is next.
+**Phase 4: Containerization** is currently in progress.
 
 The repository currently contains:
 
@@ -24,10 +24,14 @@ The repository currently contains:
 * A Python command-line application
 * Automated unit tests with pytest
 * Local formatting and linting with Ruff
+* A locally buildable Docker image
+* A dedicated non-root container runtime user
 
 PulseForge now contains a small Python command-line application foundation.
 
-Containers, Kubernetes resources, Terraform configuration, OpenTelemetry, Elastic integration, and GitHub Actions workflows have not yet been introduced.
+Local container build and execution are now implemented as part of Phase 4.
+
+Kubernetes resources, Terraform configuration, OpenTelemetry, Elastic integration, container image publishing, and Github Actions workflows have not yet been introduced.
 
 These capabilities will be introduced incrementally when they provide clear learning and engineering value.
 
@@ -184,6 +188,9 @@ docker image inspect pulseforge:phase4 \
   --format 'User={{json .Config.User}} Entrypoint={{json .Config.Entrypoint}} Cmd={{json .Config.Cmd}}'
 ```
 
+The Docker workflow is currently local only.
+
+Container image publishing, automated image validation, vulnerability scanning, and continuous integration are deferred to Phase 5. Kubernetes deployment begins in Phase 6.
 
 ## Repository Guide
 
@@ -198,7 +205,7 @@ docker image inspect pulseforge:phase4 \
 | [`src/pulseforge/`](src/pulseforge/) | Python application package                                                  |
 | [`tests/`](tests/)                   | Automated unit tests                                                        |
 
-Container, deployment, and infrastructure directories will be added when their corresponding phases begin.
+Containerization currently uses the root-level `Dockerfile` and `.dockerignore`. Deployment and infrastructure directories will be added only when their corresponding phases require them.
 
 ## Architecture
 
