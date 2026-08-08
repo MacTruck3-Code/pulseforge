@@ -33,6 +33,7 @@ Repository permissions are explicitly limited to:
 permissions:
   contents: read
 ```
+
 Repository checkout credentials are not persisted after source retrieval because later workflow steps do not need to perform authenticated Git operations. This reduces unnecessary credential exposure within the job.
 
 The jobs only need permission to read repository contents. They do not publish packages, modify repository files, create releases, deploy applications, or require deployment credentials.
