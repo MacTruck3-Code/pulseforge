@@ -12,16 +12,16 @@ Security vulnerability findings are currently informational and do not fail the 
 
 ## Workflow Triggers
 
-The `Continuous Integration` workflow currently runs:
+The `Continuous Integration` workflow runs:
 
-* On pushes to repository branches.
-* On pull requests targeting `main`.
+* On Pull Requests targeting `main`.
+* On pushes to `main`.
 
-The broad push trigger is being retained temporarily while Phase 5 is under active development so workflow changes can be validated before a Pull Request exists.
+Pull Request validation is the primary pre-merge CI checkpoint. It verifies proposed changes before they are merged into the protected default branch.
 
-Once Pull Request execution has been proven, the push trigger will be narrowed to `main` to avoid running the same validation twice for commits pushed to an open Pull Request.
+The push-to-`main` trigger validates the repository again after a merge so the integrated state is independently checked.
 
-Pull Request validation is the primary CI protection point because changes to the protected `main` branch are expected to arrive through reviewed Pull Requests.
+Feature-branch pushes do not trigger the workflow directly. This avoids duplicate workflow runs after a Pull Request has been opened.
 
 ## Workflow Security
 
@@ -33,6 +33,7 @@ Repository permissions are explicitly limited to:
 permissions:
   contents: read
 ```
+Repository checkout credentials are not persisted after source retrieval because later workflow steps do not need to perform authenticated Git operations. This reduces unnecessary credential exposure within the job.
 
 The jobs only need permission to read repository contents. They do not publish packages, modify repository files, create releases, deploy applications, or require deployment credentials.
 
