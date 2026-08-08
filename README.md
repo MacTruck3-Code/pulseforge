@@ -8,9 +8,9 @@ The goal is not only to build a working application. Each phase is designed to d
 
 ## Current Status
 
-PulseForge has completed **Phase 4: Containerization**.
+PulseForge has completed **Phase 5: Continuous Integration**.
 
-**Phase 5: Continuous Integration** is currently in progress.
+**Phase 6: Kubernetes Fundamentals** is next.
 
 The repository currently contains:
 
