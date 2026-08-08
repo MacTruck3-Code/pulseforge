@@ -8,11 +8,11 @@ It is not intended to be a daily activity log. Entries should capture completed 
 
 | Area | Status |
 |---|---|
-| Most recently completed phase | Phase 4 — Containerization |
-| Completion issue | #10 — Containerize the PulseForge application |
-| Completion Pull Request | #11 — Containerize the PulseForge application |
+| Most recently completed phase | Phase 5 — Continuous Integration |
+| Completion issue | #13 — Establish continuous integration with GitHub Actions |
+| Completion Pull Request | #14 — Establish continuous integration with GitHub Actions |
 | Phase status | Complete |
-| Next phase | Phase 5 — Continuous Integration |
+| Next phase | Phase 6 — Kubernetes Fundamentals |
 
 ## Phase 1 — Repository Foundation
 
@@ -225,6 +225,79 @@ It is not intended to be a daily activity log. Entries should capture completed 
 * Understanding `ENTRYPOINT` and `CMD` interaction with command-line arguments.
 * Evaluating when stronger image pinning provides enough value to justify maintenance overhead.
 * Automating the established manual validation workflow during Phase 5.
+
+## Phase 5 — Continuous Integration
+
+### Completed
+
+* Created Issue #13 to define the Phase 5 scope and acceptance criteria.
+* Added a GitHub Actions workflow for continuous integration.
+* Added separate Python and container validation jobs.
+* Automated pytest, Ruff formatting, and Ruff linting checks on GitHub-hosted runners.
+* Automated Docker image builds and container runtime validation.
+* Verified the container emits the expected operational status and runs as a non-root user.
+* Added Trivy container vulnerability scanning for HIGH and CRITICAL operating-system and library findings.
+* Kept vulnerability scanning informational while scanner findings and future gating policy are evaluated.
+* Applied least-privilege workflow permissions with read-only repository access.
+* Disabled persisted checkout credentials because later workflow steps do not require authenticated Git access.
+* Pinned external GitHub Actions to immutable commit SHAs.
+* Evaluated dependency and Docker caching and enabled only Trivy caching where repeated overhead demonstrated clear value.
+* Configured CI to validate Pull Requests targeting `main` and pushes to `main`.
+* Verified Pull Request CI through PR #14.
+* Verified the post-merge `main` workflow after PR #14 was merged.
+* Completed Phase 5 implementation through PR #14, which closed Issue #13.
+
+### Concepts Reinforced
+
+* Continuous Integration independently validates repository changes in a clean environment.
+* Local validation and CI validation complement each other rather than replacing one another.
+* A GitHub Actions workflow contains jobs, jobs contain steps, and reusable actions can perform individual operations.
+* GitHub-hosted runners provide temporary clean execution environments.
+* Pull Request workflows validate proposed changes before merge.
+* Push-to-`main` workflows validate the integrated repository state after merge.
+* Separate jobs make failures easier to identify and troubleshoot.
+* Workflow permissions should follow least privilege.
+* Persisted credentials should be avoided when later workflow steps do not require them.
+* Pinning actions to commit SHAs reduces supply-chain risk by preventing references from changing silently.
+* Caching should solve a measured performance problem rather than be added automatically.
+* Container vulnerability findings require context before they become merge-blocking policy.
+* Security severity does not automatically indicate exploitability or ownership.
+* Continuous Integration validates changes; Continuous Delivery publishes, promotes, or deploys them.
+
+### Decisions Made
+
+* CI uses Python 3.12 as the primary validation version rather than introducing a compatibility matrix prematurely.
+* Python and container validation remain separate jobs.
+* Feature-branch pushes do not trigger CI directly.
+* Pull Requests targeting `main` provide the primary pre-merge validation.
+* Pushes to `main` validate the integrated repository state.
+* External GitHub Actions are pinned to immutable commit SHAs.
+* Workflow permissions are limited to `contents: read`.
+* Checkout credentials are not persisted.
+* Python dependency caching is deferred while dependency installation remains fast.
+* Docker layer caching is deferred while image builds remain small and fast.
+* Trivy caching is enabled because repeated runs demonstrated meaningful download and setup overhead.
+* Trivy vulnerability findings remain informational rather than merge-blocking.
+* Additional overlapping security scanners are deferred until they provide demonstrated value.
+* Container publishing and Continuous Delivery remain deferred to later phases.
+* Required CI status checks in branch protection are deferred until repository governance changes are deliberately evaluated.
+
+### Challenges
+
+* Early workflow iterations produced duplicate validation from feature-branch pushes and Pull Request events.
+* Trigger behavior was refined to avoid unnecessary duplicate runs.
+* Initial Trivy execution included behavior outside the intended vulnerability-only scope and was narrowed deliberately.
+* Trivy identified vulnerabilities inherited from the base image, reinforcing the need to distinguish application findings from upstream dependency findings.
+* Workflow security and caching choices required balancing stronger controls against unnecessary maintenance complexity.
+
+### Areas to Reinforce
+
+* Troubleshooting more complex GitHub Actions failures.
+* Maintaining SHA-pinned action versions safely over time.
+* Deciding when CI checks should become required branch-protection rules.
+* Defining a practical vulnerability remediation and exception policy.
+* Evaluating when dependency or Docker caching becomes worthwhile.
+* Understanding how Kubernetes validation should integrate into CI during Phase 6.
 
 ## Future Entries
 

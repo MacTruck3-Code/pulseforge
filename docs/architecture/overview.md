@@ -10,7 +10,7 @@ This document describes the current architectural direction. Planned components 
 
 ## Current Architecture State
 
-PulseForge has completed its containerization foundation and is currently implementing continuous integration.
+PulseForge has completed its continuous integration foundation.
 
 The current system consists of:
 
@@ -28,7 +28,7 @@ GitHub Actions now validates application behavior, formatting, linting, containe
 
 The CI workflow validates artifacts but does not publish or deploy them.
 
-Kubernetes deployment remains the next architectural expansion after Phase 5 is completed.
+Kubernetes deployment is the next architectural expansion in Phase 6.
 
 ## Architectural Principles
 
