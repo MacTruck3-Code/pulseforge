@@ -160,9 +160,19 @@ git diff --check
 git status
 ```
 
-Before opening a Pull Request, run all checks relevant to the current lesson.
+Before opening a Pull Request, run all checks relevant to the current lesson locally.
 
-More automated validation will be added as the project develops.
+For Python changes, the established validation commands are:
+
+```bash
+python3 -m pytest
+python3 -m ruff format --check .
+python3 -m ruff check .
+```
+
+GitHub Actions also runs automated Python and container validation as part of continuous integration.
+
+Local validation remains important because it provides faster feedback and makes CI failures easier to reproduce and troubleshoot.
 
 ## Definition of Done
 

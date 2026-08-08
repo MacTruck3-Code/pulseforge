@@ -8,25 +8,27 @@ The architecture will grow incrementally as each new technology provides clear v
 
 This document describes the current architectural direction. Planned components are not considered implemented until they exist in the repository and have been validated.
 
-## Current State
+## Current Architecture State
 
-PulseForge has completed **Phase 4: Containerization**.
+PulseForge has completed its containerization foundation and is currently implementing continuous integration.
 
-**Phase 5: Continuous Integration** is next.
+The current system consists of:
 
-The repository currently contains:
+```text
+Python Application
+      ↓
+Docker Image
+      ↓
+GitHub Actions CI
+      ├─ Python validation
+      └─ Container validation
+```
 
-* Project, architecture, and learning documentation
-* Contribution and AI collaboration guidelines
-* A protected-branch development workflow
-* A Python 3.12 or newer command-line application under `src/pulseforge/`
-* Project metadata and development dependencies in `pyproject.toml`
-* Unit tests under `tests/`
-* Local testing, formatting, and linting with pytest and Ruff
-* A locally buildable Docker image for the PulseForge application
-* A dedicated non-root runtime user inside the container
+GitHub Actions now validates application behavior, formatting, linting, container builds, container runtime behavior, non-root execution, and container vulnerabilities.
 
-PulseForge now has a locally buildable container image. It does not yet contain Kubernetes resources, Helm charts, Terraform configuration, OpenTelemetry instrumentation, Elastic integration, a published container image, or automated GitHub Actions workflows.
+The CI workflow validates artifacts but does not publish or deploy them.
+
+Kubernetes deployment remains the next architectural expansion after Phase 5 is completed.
 
 ## Architectural Principles
 
@@ -84,21 +86,33 @@ PulseForge uses pytest for focused unit testing.
 
 Ruff provides automated formatting, linting, import-order validation, and basic static analysis.
 
-These checks currently run locally before a Pull Request is opened. Automated execution through GitHub Actions is planned for Phase 5.
+These checks can be run locally before changes are pushed and are also executed automatically by GitHub Actions during continuous integration.
+
+Keeping the local and CI commands aligned makes failures easier to reproduce and troubleshoot.
 
 ### Containerization — Implemented
 
-PulseForge can be built locally as a Docker image using an official Python 3.12 slim base image.
+PulseForge can be built as a Docker image using an official Python 3.12 slim base image.
 
 The image installs PulseForge through its existing Python package configuration and uses the installed `pulseforge` command as the container process.
 
 The runtime process executes as a dedicated non-root user.
 
-The image intentionally contains only the files needed to install and run the application. Development tools such as pytest and Ruff remain part of the local development environment rather than the runtime image.
+Development tools such as pytest and Ruff are not installed in the runtime image.
 
-Container builds and execution are currently local only. Image publishing, automated image validation, vulnerability scanning, and registry selection remain deferred.
+Container builds and runtime behavior can be validated locally and are also validated automatically through GitHub Actions.
 
-Kubernetes deployment begins in Phase 6 after the local container workflow and continuous integration process have been established.
+Continuous integration verifies:
+
+* The image builds successfully.
+* The application produces the expected operational output.
+* The container exits successfully.
+* The runtime process does not execute as root.
+* HIGH and CRITICAL operating-system and library vulnerabilities are reported by Trivy.
+
+Vulnerability findings are currently informational rather than merge-blocking.
+
+Container image publishing and registry selection remain deferred. Kubernetes deployment begins in Phase 6 after the continuous integration foundation is complete.
 
 ### Kubernetes
 
@@ -120,7 +134,26 @@ Elastic Stack will be used to store, explore, visualize, and alert on relevant t
 
 ### Continuous Integration and Delivery
 
-GitHub Actions will automate validation and delivery processes after those processes have first been established and understood locally.
+GitHub Actions provides the current continuous integration layer for PulseForge.
+
+Continuous integration runs established validation automatically on GitHub-hosted runners. The workflow includes separate Python and container validation jobs so failures remain focused and understandable.
+
+Current CI responsibilities include:
+
+* Unit testing with pytest.
+* Ruff formatting validation.
+* Ruff linting and static analysis.
+* Container image builds.
+* Container runtime behavior validation.
+* Non-root runtime verification.
+* Informational Trivy vulnerability scanning.
+
+The workflow follows least-privilege repository permissions and pins external GitHub Actions to immutable commit SHAs.
+
+Continuous delivery has not yet been implemented.
+
+PulseForge does not currently publish container images, deploy applications, promote artifacts between environments, or require deployment credentials. Those responsibilities remain deferred until later phases.
+
 
 ## Expected Future System Context
 
@@ -160,9 +193,7 @@ The following decisions are intentionally deferred:
 * Terraform backend
 * OpenTelemetry Collector topology
 * Elastic deployment model
-* CI/CD workflow design
 * Container image publishing and versioning strategy
-* Automated container vulnerability scanning
 
 These decisions will be made when the project has enough requirements to evaluate meaningful trade-offs.
 

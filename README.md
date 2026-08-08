@@ -10,28 +10,31 @@ The goal is not only to build a working application. Each phase is designed to d
 
 PulseForge has completed **Phase 4: Containerization**.
 
-**Phase 5: Continuous Integration** is next.
+**Phase 5: Continuous Integration** is currently in progress.
 
 The repository currently contains:
 
 * A protected `main` branch workflow
 * Contribution guidelines
 * AI collaboration guidelines
-* Initial architecture documentation
+* Architecture documentation
 * A learning roadmap and progress tracker
 * Pull Request and Issue templates
 * Repository formatting and file-handling rules
 * A Python command-line application
 * Automated unit tests with pytest
-* Local formatting and linting with Ruff
-* A locally buildable Docker image
-* A dedicated non-root container runtime user
+* Formatting and linting with Ruff
+* A Docker container running as a dedicated non-root user
+* GitHub Actions continuous integration
+* Automated Python testing and code-quality validation
+* Automated container build and runtime validation
+* Informational container vulnerability scanning with Trivy
 
-PulseForge now contains a small Python command-line application foundation.
+The continuous integration workflow reproduces established local validation on GitHub-hosted runners.
 
-Phase 4 containerization is complete, with local container build and execution now established.
+Container images are built and validated during CI but are not published or deployed.
 
-Kubernetes resources, Terraform configuration, OpenTelemetry, Elastic integration, container image publishing, and GitHub Actions workflows have not yet been introduced.
+Kubernetes resources, Terraform configuration, OpenTelemetry, Elastic integration, container publishing, and continuous delivery have not yet been introduced.
 
 These capabilities will be introduced incrementally when they provide clear learning and engineering value.
 
@@ -188,9 +191,11 @@ docker image inspect pulseforge:phase4 \
   --format 'User={{json .Config.User}} Entrypoint={{json .Config.Entrypoint}} Cmd={{json .Config.Cmd}}'
 ```
 
-The Docker workflow is currently local only.
+The Docker workflow remains available for local validation.
 
-Container image publishing, automated image validation, vulnerability scanning, and continuous integration are deferred to Phase 5. Kubernetes deployment begins in Phase 6.
+GitHub Actions now automates container image builds, runtime validation, non-root user verification, and informational vulnerability scanning with Trivy.
+
+Container image publishing and deployment are not part of Phase 5. Kubernetes deployment begins in Phase 6.
 
 ## Repository Guide
 
@@ -198,7 +203,7 @@ Container image publishing, automated image validation, vulnerability scanning, 
 | ------------------------------------ | --------------------------------------------------------------------------- |
 | [`docs/`](docs/)                     | System architecture and technical documentation                             |
 | [`learning/`](learning/)             | Learning roadmap, progress, and skill development                           |
-| [`.github/`](.github/)               | Pull Request templates, Issue templates, and planned workflow documentation |
+| [`.github/`](.github/)               | Pull Request templates, Issue templates, and GitHub Actions workflows       |
 | [`AGENTS.md`](AGENTS.md)             | Instructions for AI assistants collaborating on the project                 |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contribution and development workflow                                       |
 | [`LICENSE`](LICENSE)                 | Project license                                                             |

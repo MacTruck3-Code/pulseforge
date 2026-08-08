@@ -1,0 +1,75 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  python-validation:
+    name: Python validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.12"
+
+      - name: Install development dependencies
+        run: python3 -m pip install --editable ".[dev]"
+
+      - name: Run unit tests
+        run: python3 -m pytest
+
+      - name: Check formatting
+        run: python3 -m ruff format --check .
+
+      - name: Run linting
+        run: python3 -m ruff check .
+  container-validation:
+    name: Container validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Build container image
+        run: docker build --tag pulseforge:ci .
+
+      - name: Validate container behavior
+        run: |
+          output="$(docker run --rm pulseforge:ci 2>&1)"
+          printf '%s\n' "$output"
+          grep -Fq "PulseForge status: operational" <<< "$output"
+
+      - name: Validate non-root user
+        run: |
+          user_id="$(docker run --rm --entrypoint id pulseforge:ci -u)"
+          printf 'Container UID: %s\n' "$user_id"
+          test "$user_id" -ne 0
+
+      - name: Scan container vulnerabilities
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: "pulseforge:ci"
+          format: "table"
+          scanners: "vuln"
+          vuln-type: "os,library"
+          severity: "HIGH,CRITICAL"
+          exit-code: "0"
+          cache: "true"
