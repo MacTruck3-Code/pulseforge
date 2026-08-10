@@ -12,7 +12,10 @@ license = "MIT"
 authors = [
     { name = "Clarence McIntyre III" }
 ]
-dependencies = []
+dependencies = [
+    "starlette",
+    "uvicorn",
+]
 
 [project.optional-dependencies]
 dev = [
