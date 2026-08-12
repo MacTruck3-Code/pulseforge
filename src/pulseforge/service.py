@@ -1,9 +1,9 @@
 """HTTP service for PulseForge."""
 
+import uvicorn
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 from starlette.routing import Route
-import uvicorn
 
 
 async def readiness(request):
@@ -16,6 +16,7 @@ app = Starlette(
         Route("/health/ready", readiness),
     ]
 )
+
 
 def serve() -> None:
     """Run the PulseForge HTTP service."""

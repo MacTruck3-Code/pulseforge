@@ -33,6 +33,7 @@ def test_main_exits_with_failure_when_runtime_error_occurs() -> None:
 
     assert exit_info.value.code == 1
 
+
 def test_main_starts_service_for_serve_command() -> None:
     """Verify that the serve command starts the HTTP service."""
     with (
