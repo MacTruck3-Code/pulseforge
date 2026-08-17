@@ -31,6 +31,7 @@ Local Kubernetes with kind
              ↓
         /health/ready
 ```
+
 GitHub Actions validates the same major layers independently:
 
 ```text
@@ -39,13 +40,21 @@ GitHub Actions CI
       ├─ Container validation
       └─ Kubernetes validation with kind
 ```
+
 The existing `pulseforge` command remains a run-to-completion process and is used with a Kubernetes Job.
+
 The `pulseforge serve` command provides a legitimate long-running HTTP process for the Kubernetes Deployment.
+
 The Deployment is exposed internally through a ClusterIP Service.
+
 The Deployment uses `/health/ready` as a readiness probe so Pods receive Service traffic only when the application is ready.
+
 Initial CPU and memory requests and limits are configured based on observed local resource usage. These values are learning-oriented defaults rather than production capacity targets.
+
 ConfigMap and application Secret usage remain deferred because PulseForge does not yet have meaningful non-sensitive runtime configuration or application credentials that require them.
+
 The CI workflow builds the application image, creates an ephemeral kind cluster, loads the local image into the cluster, applies the Kubernetes manifests, and validates the Deployment, Job, and Service behavior.
+
 Container images are not published to a registry, and Continuous Delivery has not been introduced.
 
 ## Architectural Principles
@@ -136,7 +145,9 @@ Continuous integration verifies:
 
 Vulnerability findings are currently informational rather than merge-blocking.
 
-Container image publishing and registry selection remain deferred. Kubernetes deployment begins in Phase 6 after the continuous integration foundation is complete.
+Container image publishing and registry selection remain deferred.
+
+Phase 6 extended the containerized application into local Kubernetes, using the same image for the run-to-completion Job and long-running Deployment modes.
 
 ### Kubernetes — Implemented
 
