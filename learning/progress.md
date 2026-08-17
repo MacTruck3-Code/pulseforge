@@ -10,6 +10,7 @@ It is not intended to be a daily activity log. Entries should capture completed 
 |---|---|
 | Most recently completed phase | Phase 6 — Kubernetes Fundamentals |
 | Completion issue | #16 — Establish Kubernetes fundamentals |
+| Completion Pull Request | #17 — Establish Kubernetes fundamentals |
 | Phase status | Complete |
 | Next phase | Phase 7 — Helm |
 
