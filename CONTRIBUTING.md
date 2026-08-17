@@ -150,6 +150,16 @@ Update documentation whenever a change affects:
 
 Documentation must describe the repository as it currently exists. Future plans should be clearly identified as future work.
 
+For phase implementation work:
+
+* Relevant documentation must be reviewed before the implementation Pull Request is opened.
+* Once implementation and validation acceptance criteria are satisfied, phase documentation must describe the phase as Complete before the implementation Pull Request is merged.
+* `learning/progress.md` and `learning/roadmap.md` must identify the completed phase and the next phase before merge.
+* The implementation Pull Request is the final documentation update for the phase.
+* Do not use temporary statuses such as `In progress` or `PR pending` in final phase documentation merely because the implementation Pull Request has not yet merged.
+* After merge, only verify the merge, issue closure, CI results, and branch cleanup.
+* Do not create a separate post-merge documentation change solely to mark the phase complete.
+
 ## Validation
 
 Before committing, review the changed files:
@@ -170,7 +180,9 @@ python3 -m ruff format --check .
 python3 -m ruff check .
 ```
 
-GitHub Actions also runs automated Python and container validation as part of continuous integration.
+GitHub Actions also runs automated Python, container, and Kubernetes validation as part of continuous integration.
+
+Kubernetes CI creates an ephemeral kind cluster, applies the repository manifests, and validates Deployment readiness, Job completion, and Service access.
 
 Local validation remains important because it provides faster feedback and makes CI failures easier to reproduce and troubleshoot.
 

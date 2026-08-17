@@ -98,6 +98,16 @@ Planned components must be clearly labeled as future work.
 
 Avoid documenting proposed architecture as though it has already been implemented.
 
+For phase implementation work:
+
+* Review all relevant documentation before opening the implementation Pull Request.
+* Once implementation and validation acceptance criteria are satisfied, final phase documentation must describe the phase as Complete before merge.
+* `learning/progress.md` and `learning/roadmap.md` must identify the completed phase and the next phase before merge.
+* Do not use temporary statuses such as `In progress` or `PR pending` in final phase documentation merely because the implementation Pull Request has not yet merged.
+* The implementation Pull Request is the final documentation update for the phase.
+* After merge, only verify the merge, issue closure, CI results, and branch cleanup.
+* Do not create a separate post-merge documentation change solely to mark the phase complete.
+
 ## Review Expectations
 
 When reviewing a change, AI assistants should evaluate:

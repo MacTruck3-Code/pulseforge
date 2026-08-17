@@ -219,7 +219,7 @@ The following practices apply throughout the roadmap:
 | Phase 3 — Testing and Code Quality      | Complete    |
 | Phase 4 — Containerization              | Complete    |
 | Phase 5 — Continuous Integration        | Complete    |
-| Phase 6 — Kubernetes Fundamentals       | Not started |
+| Phase 6 — Kubernetes Fundamentals       | Complete    |
 | Phase 7 — Helm                          | Not started |
 | Phase 8 — Observability                 | Not started |
 | Phase 9 — Elastic Stack Integration     | Not started |

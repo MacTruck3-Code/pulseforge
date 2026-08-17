@@ -44,8 +44,11 @@ Exclude:
 * [ ] The change has been validated.
 * [ ] Relevant documentation has been updated.
 * [ ] The reasoning and trade-offs are understood.
+* [ ] Relevant documentation is reviewed before the implementation Pull Request is opened.
+* [ ] Final phase documentation describes the completed implementation state before merge.
+* [ ] `learning/progress.md` and `learning/roadmap.md` identify the completed phase and next phase when applicable.
 * [ ] The work is reviewed through a Pull Request.
-* [ ] The learning progress record is updated when appropriate.
+* [ ] Post-merge verification is limited to merge status, issue closure, CI results, and branch cleanup.
 
 ## Validation
 

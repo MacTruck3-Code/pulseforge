@@ -27,7 +27,11 @@ Describe how the changes were reviewed or tested.
 
 ## Documentation
 
+* [ ] Relevant documentation was reviewed before this Pull Request was opened.
 * [ ] Relevant documentation was updated.
+* [ ] Final phase documentation describes the completed implementation state.
+* [ ] `learning/progress.md` and `learning/roadmap.md` identify the completed phase and next phase when applicable.
+* [ ] No separate post-merge documentation update is required.
 * [ ] No documentation changes were required.
 
 Explain when documentation changes were not required:
