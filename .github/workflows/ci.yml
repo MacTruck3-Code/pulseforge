@@ -38,6 +38,7 @@ jobs:
 
       - name: Run linting
         run: python3 -m ruff check .
+
   container-validation:
     name: Container validation
     runs-on: ubuntu-latest
@@ -73,3 +74,121 @@ jobs:
           severity: "HIGH,CRITICAL"
           exit-code: "0"
           cache: "true"
+
+  kubernetes-validation:
+    name: Kubernetes validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Install kind
+        run: |
+          curl --fail --location --show-error --silent \
+            --output kind-linux-amd64 \
+            https://github.com/kubernetes-sigs/kind/releases/download/v0.32.0/kind-linux-amd64
+
+          curl --fail --location --show-error --silent \
+            --output kind-linux-amd64.sha256sum \
+            https://github.com/kubernetes-sigs/kind/releases/download/v0.32.0/kind-linux-amd64.sha256sum
+
+          sha256sum --check kind-linux-amd64.sha256sum
+
+          chmod +x kind-linux-amd64
+          sudo mv kind-linux-amd64 /usr/local/bin/kind
+
+          kind version
+
+      - name: Install kubectl
+        run: |
+          curl --fail --location --show-error --silent \
+            --output kubectl \
+            https://dl.k8s.io/release/v1.36.3/bin/linux/amd64/kubectl
+
+          curl --fail --location --show-error --silent \
+            --output kubectl.sha256 \
+            https://dl.k8s.io/release/v1.36.3/bin/linux/amd64/kubectl.sha256
+
+          echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+          kubectl version --client
+
+      - name: Create kind cluster
+        run: |
+          kind create cluster \
+            --name pulseforge-ci \
+            --wait 60s
+
+      - name: Build container image
+        run: docker build --tag pulseforge:phase6 .
+
+      - name: Load image into kind
+        run: |
+          kind load docker-image pulseforge:phase6 \
+            --name pulseforge-ci
+
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f k8s/namespace.yml
+          kubectl apply -f k8s/deployment.yml
+          kubectl apply -f k8s/service.yml
+          kubectl apply -f k8s/job.yml
+
+      - name: Validate Deployment rollout
+        run: |
+          kubectl rollout status deployment/pulseforge \
+            --namespace pulseforge \
+            --timeout 60s
+
+      - name: Validate Job completion
+        run: |
+          kubectl wait \
+            --for=condition=complete \
+            job/pulseforge \
+            --namespace pulseforge \
+            --timeout 60s
+
+      - name: Validate Service access
+        run: |
+          kubectl port-forward \
+            service/pulseforge \
+            --namespace pulseforge \
+            18080:8080 \
+            > /tmp/pulseforge-port-forward.log 2>&1 &
+
+          port_forward_pid=$!
+          trap 'kill "$port_forward_pid"' EXIT
+
+          for attempt in {1..10}; do
+            if curl --fail --silent \
+              http://127.0.0.1:18080/health/ready \
+              | grep -Fq '{"status":"ready"}'; then
+              exit 0
+            fi
+
+            sleep 1
+          done
+
+          cat /tmp/pulseforge-port-forward.log
+          exit 1
+
+      - name: Collect Kubernetes diagnostics
+        if: failure()
+        run: |
+          kubectl get all --namespace pulseforge || true
+          kubectl get events \
+            --namespace pulseforge \
+            --sort-by='.lastTimestamp' || true
+          kubectl describe deployment pulseforge \
+            --namespace pulseforge || true
+          kubectl describe job pulseforge \
+            --namespace pulseforge || true
+          kubectl logs deployment/pulseforge \
+            --namespace pulseforge || true
+          kubectl logs job/pulseforge \
+            --namespace pulseforge || true

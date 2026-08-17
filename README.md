@@ -8,9 +8,9 @@ The goal is not only to build a working application. Each phase is designed to d
 
 ## Current Status
 
-PulseForge has completed **Phase 5: Continuous Integration**.
+PulseForge has completed **Phase 6: Kubernetes Fundamentals**.
 
-**Phase 6: Kubernetes Fundamentals** is next.
+**Phase 7: Helm** is next.
 
 The repository currently contains:
 
@@ -22,21 +22,36 @@ The repository currently contains:
 * Pull Request and Issue templates
 * Repository formatting and file-handling rules
 * A Python command-line application
+* A long-running HTTP service mode
+* A readiness endpoint at `/health/ready`
 * Automated unit tests with pytest
 * Formatting and linting with Ruff
 * A Docker container running as a dedicated non-root user
+* Plain Kubernetes manifests for a Namespace, Job, Deployment, and Service
+* A Kubernetes readiness probe
+* Deliberate CPU and memory requests and limits
+* Local Kubernetes development with kind
 * GitHub Actions continuous integration
 * Automated Python testing and code-quality validation
 * Automated container build and runtime validation
+* Automated Kubernetes integration validation with kind
 * Informational container vulnerability scanning with Trivy
 
-The continuous integration workflow reproduces established local validation on GitHub-hosted runners.
+The existing `pulseforge` command remains a run-to-completion application suitable for Kubernetes Jobs.
 
-Container images are built and validated during CI but are not published or deployed.
+The `pulseforge serve` command provides a long-running HTTP service suitable for a Kubernetes Deployment.
 
-Kubernetes resources, Terraform configuration, OpenTelemetry, Elastic integration, container publishing, and continuous delivery have not yet been introduced.
+The Kubernetes Deployment is exposed internally through a ClusterIP Service and uses `/health/ready` as its readiness probe.
 
-These capabilities will be introduced incrementally when they provide clear learning and engineering value.
+The continuous integration workflow validates Python, container, and Kubernetes behavior on GitHub-hosted runners.
+
+Container images are built and validated during CI but are not published to a registry or deployed to an external environment.
+
+ConfigMap and application Secret usage remain intentionally deferred because PulseForge does not yet have meaningful runtime configuration or application credentials that require them.
+
+Helm, Terraform, OpenTelemetry, Elastic integration, container publishing, and continuous delivery have not yet been introduced.
+
+These capabilities will continue to be introduced incrementally when they provide clear learning and engineering value.
 
 ## Learning Goals
 
@@ -152,50 +167,55 @@ python3 -m ruff check .
 
 PulseForge can be built and run locally as a Docker container.
 
-The container uses an official Python 3.12 slim base image, installs PulseForge using its existing Python package configuration, and runs the application as a dedicated non-root user.
+The container uses an official Python 3.12 slim base image, installs PulseForge through its Python package configuration, and runs as a dedicated non-root user.
 
-Build the image from the repository root:
+Build the Phase 6 image from the repository root:
 
 ```bash
-docker build --tag pulseforge:phase4 .
+docker build --tag pulseforge:phase6 .
 ```
 
-Run PulseForge:
+Run the original command-line mode:
 ```bash
-docker run --rm pulseforge:phase4
+docker run --rm pulseforge:phase6
 ```
 
-A successful container run produces a log message similar to:
+A successful run produces a log message similar to:
 ```bash
 INFO pulseforge.app: PulseForge status: operational
 ```
 The container should exit with status code `0`.
 
-Verify the exit code:
+Run the long-running HTTP service:
 ```bash
-docker run --rm pulseforge:phase4
-echo $?
+docker run --rm \
+  --publish 8080:8080 \
+  pulseforge:phase6 serve
+```
+
+Verify the readiness endpoint:
+```bash
+curl http://127.0.0.1:8080/health/ready
+```
+
+A successful response is:
+```json
+{"status":"ready"}
 ```
 
 Verify that the container runs as a non-root user:
 ```bash
 docker run --rm \
   --entrypoint id \
-  pulseforge:phase4
+  pulseforge:phase6
 ```
 The reported UID must not be `0`.
 
-Inspect the configured container process and runtime user:
-```bash
-docker image inspect pulseforge:phase4 \
-  --format 'User={{json .Config.User}} Entrypoint={{json .Config.Entrypoint}} Cmd={{json .Config.Cmd}}'
-```
+GitHub Actions automates container image builds, runtime validation, non-root user verification, and informational vulnerability scanning with Trivy.
 
-The Docker workflow remains available for local validation.
-
-GitHub Actions now automates container image builds, runtime validation, non-root user verification, and informational vulnerability scanning with Trivy.
-
-Container image publishing and deployment are not part of Phase 5. Kubernetes deployment begins in Phase 6.
+The same container image supports both Kubernetes workload models introduced in Phase 6:
+* `pulseforge` for finite Job execution.
+* `pulseforge serve` for the long-running Deployment.
 
 ## Repository Guide
 
@@ -209,34 +229,46 @@ Container image publishing and deployment are not part of Phase 5. Kubernetes de
 | [`LICENSE`](LICENSE)                 | Project license                                                             |
 | [`src/pulseforge/`](src/pulseforge/) | Python application package                                                  |
 | [`tests/`](tests/)                   | Automated unit tests                                                        |
+| [`k8s/`](k8s/)                       | Plain Kubernetes manifests for local deployment and validation              |
 
-Containerization currently uses the root-level `Dockerfile` and `.dockerignore`. Deployment and infrastructure directories will be added only when their corresponding phases require them.
+Containerization uses the root-level `Dockerfile` and `.dockerignore`.
+
+Kubernetes deployment configuration is stored under `k8s/` as plain manifests.
+
+Additional deployment and infrastructure directories will be added only when their corresponding phases provide a clear need.
 
 ## Architecture
 
-The architecture will evolve incrementally as project requirements become clear.
-
-The expected long-term direction includes:
+PulseForge currently supports both finite command execution and long-running service execution.
 
 ```text
-User or Client
-      |
-      v
-PulseForge Application
-      |
-      v
-OpenTelemetry Instrumentation
-      |
-      v
-Telemetry Collection
-      |
-      v
-Elastic Stack
+                    +----------------------+
+                    |   PulseForge Image   |
+                    +----------+-----------+
+                               |
+                 +-------------+-------------+
+                 |                           |
+                 v                           v
+        Kubernetes Job               Kubernetes Deployment
+          pulseforge                   pulseforge serve
+                                             |
+                                             v
+                                      ClusterIP Service
+                                             |
+                                             v
+                                      /health/ready
 ```
 
-The application is expected to run in Kubernetes, with deployment configuration packaged through Helm and infrastructure managed through Terraform.
+Local Kubernetes development uses kind and plain manifests stored under `k8s/`.
 
-These components represent future direction and have not yet been implemented.
+GitHub Actions independently validates:
+* Python behavior and code quality
+* Container build and runtime behavior
+* Kubernetes Job, Deployment, and Service behavior in an ephemeral kind cluster
+
+The Kubernetes layer intentionally remains small. Helm, Terraform, OpenTelemetry, Elastic integration, container publishing, and Continuous Delivery are deferred to later phases.
+
+The next architectural expansion is Phase 7: Helm, where the existing plain Kubernetes manifests will provide the baseline for learning reusable deployment packaging and configuration.
 
 See the [Architecture Overview](docs/architecture/overview.md) for more detail.
 

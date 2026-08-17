@@ -8,11 +8,11 @@ It is not intended to be a daily activity log. Entries should capture completed 
 
 | Area | Status |
 |---|---|
-| Most recently completed phase | Phase 5 — Continuous Integration |
-| Completion issue | #13 — Establish continuous integration with GitHub Actions |
-| Completion Pull Request | #14 — Establish continuous integration with GitHub Actions |
+| Most recently completed phase | Phase 6 — Kubernetes Fundamentals |
+| Completion issue | #16 — Establish Kubernetes fundamentals |
+| Completion Pull Request | #17 — Establish Kubernetes fundamentals |
 | Phase status | Complete |
-| Next phase | Phase 6 — Kubernetes Fundamentals |
+| Next phase | Phase 7 — Helm |
 
 ## Phase 1 — Repository Foundation
 
@@ -298,6 +298,97 @@ It is not intended to be a daily activity log. Entries should capture completed 
 * Defining a practical vulnerability remediation and exception policy.
 * Evaluating when dependency or Docker caching becomes worthwhile.
 * Understanding how Kubernetes validation should integrate into CI during Phase 6.
+
+
+
+## Phase 6 — Kubernetes Fundamentals
+
+### Completed
+
+* Created Issue #16 to define the Phase 6 scope and acceptance criteria.
+* Selected kind as the local Kubernetes environment after evaluating the learning goals and trade-offs.
+* Created a dedicated `pulseforge` Namespace.
+* Deployed the existing run-to-completion CLI as a Kubernetes Job and verified successful completion, logs, and exit behavior.
+* Added a minimal long-running HTTP service using Starlette and Uvicorn while preserving the original `pulseforge` CLI behavior.
+* Added `/health/ready` as the application readiness endpoint.
+* Deployed the long-running service through a Kubernetes Deployment.
+* Added a ClusterIP Service to expose the Deployment internally.
+* Observed the Deployment, ReplicaSet, and Pod ownership relationship.
+* Verified Kubernetes reconciliation by deleting a managed Pod and observing its automatic replacement.
+* Added and validated a Kubernetes readiness probe.
+* Deliberately caused a readiness failure and used Pod state, Events, and EndpointSlices to troubleshoot the failure.
+* Confirmed that an unready Pod remains running but is removed from eligible Service endpoints.
+* Evaluated liveness probes and intentionally deferred one because PulseForge does not yet have a meaningful liveness failure condition.
+* Measured container resource usage and added initial CPU and memory requests and limits.
+* Observed the Pod Quality of Service class change from BestEffort to Burstable.
+* Evaluated ConfigMaps and Secrets and intentionally deferred application-specific resources because no meaningful runtime configuration or credentials currently exist.
+* Inspected Kubernetes projected service-account data without exposing the service-account token.
+* Practiced Kubernetes troubleshooting with `kubectl get`, `kubectl describe`, Events, logs, EndpointSlices, and container runtime statistics.
+* Added Kubernetes integration validation to GitHub Actions using an ephemeral kind cluster.
+* Configured CI to build and load the local image, apply the Kubernetes manifests, validate Deployment readiness, validate Job completion, validate Service access, and collect diagnostics on failure.
+* Pinned kind and kubectl versions used by Kubernetes CI.
+* Confirmed the existing pytest and Ruff validation remains healthy with six passing tests.
+
+### Concepts Reinforced
+
+* Kubernetes separates desired state from the controllers responsible for maintaining that state.
+* A Pod is the basic workload execution unit, while higher-level controllers manage Pod lifecycle.
+* A Deployment manages ReplicaSets, and ReplicaSets maintain the requested number of Pods.
+* Kubernetes reconciliation continuously works to restore declared desired state.
+* Jobs are appropriate for finite run-to-completion workloads.
+* Deployments are appropriate for processes intended to remain running.
+* Application behavior should determine the Kubernetes workload type rather than changing application behavior to satisfy a controller.
+* A Service provides stable network access to selected Pods even as individual Pod identities change.
+* Labels and selectors connect Kubernetes resources without directly coupling them by Pod name.
+* Readiness answers whether a Pod should receive traffic.
+* A readiness failure does not imply that a container should be restarted.
+* Health probes should represent meaningful application behavior rather than exist only to satisfy a checklist.
+* Resource requests influence scheduling and resource guarantees, while limits constrain maximum resource consumption.
+* Kubernetes configuration should be introduced only when the application has real configuration to externalize.
+* Secrets require careful handling even when an application does not yet require application-specific credentials.
+* `Running` and `Ready` represent different workload states.
+* Kubernetes Events, descriptions, logs, and endpoint information provide complementary troubleshooting evidence.
+* Local Kubernetes integration testing can catch configuration and runtime problems that Python and container tests cannot detect.
+
+### Decisions Made
+
+* kind is the local Kubernetes environment for the current learning stage.
+* Plain Kubernetes manifests are used before introducing Helm.
+* The original `pulseforge` command remains a run-to-completion CLI and runs as a Kubernetes Job.
+* `pulseforge serve` provides the legitimate long-running process used by the Deployment.
+* Starlette and Uvicorn provide the smallest useful HTTP service foundation for the current requirements.
+* The Kubernetes Service uses the default ClusterIP type because external exposure is not yet required.
+* `/health/ready` is used as the readiness probe.
+* A liveness probe is deferred until PulseForge has a meaningful failure condition that requires restart behavior.
+* Initial resource requests are `10m` CPU and `32Mi` memory.
+* Initial resource limits are `250m` CPU and `128Mi` memory.
+* Current resource values are learning-oriented baselines rather than production capacity targets.
+* Application ConfigMaps and Secrets are deferred until real configuration or credentials exist.
+* Kubernetes CI uses kind so local and automated integration validation share the same basic cluster model.
+* Kubernetes CI rebuilds the image independently rather than sharing artifacts between GitHub Actions jobs.
+* Container publishing, external deployment, and Continuous Delivery remain deferred.
+* Helm remains deferred to Phase 7.
+
+### Challenges
+
+* The initial Kubernetes environment required understanding Docker permissions, kubeconfig contexts, and the relationship between kind and containerd.
+* The existing CLI exited successfully by design, which made it unsuitable for direct use in a Deployment.
+* Adding a long-running service required preserving existing CLI compatibility rather than replacing the original execution model.
+* A deliberately broken readiness path demonstrated that a Pod can be Running while remaining unready.
+* Service routing required understanding how selectors and EndpointSlices connect stable Services to changing Pods.
+* Resource settings required distinguishing measured local behavior from production sizing assumptions.
+* Kubernetes CI required balancing useful integration coverage against unnecessary deployment and registry complexity.
+
+### Areas to Reinforce
+
+* Reading Kubernetes object status and Events during less controlled failures.
+* Understanding scheduler behavior when resource requests compete for limited capacity.
+* Distinguishing readiness, liveness, and startup probes as application behavior becomes more complex.
+* Working with ConfigMaps and Secrets when genuine runtime configuration is introduced.
+* Understanding Kubernetes identity, ServiceAccounts, and RBAC when the application needs Kubernetes API access.
+* Diagnosing Service networking and DNS problems.
+* Maintaining Kubernetes CI as manifests evolve.
+* Understanding when plain manifests become repetitive enough to justify Helm.
 
 ## Future Entries
 

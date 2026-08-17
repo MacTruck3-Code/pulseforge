@@ -29,9 +29,16 @@ Each lesson should follow this general process:
 3. Create an issue with clear acceptance criteria.
 4. Complete the work on a feature branch.
 5. Validate the implementation.
-6. Review the work through a Pull Request.
-7. Record the meaningful learning outcome.
-8. Update the roadmap when priorities change.
+6. Update and review the relevant documentation.
+7. Record the completed learning outcomes and update the roadmap.
+8. Open and review the implementation Pull Request.
+9. Finalize all phase documentation inside that Pull Request before merge.
+10. Merge the Pull Request only after the implementation, validation, documentation, and acceptance criteria are complete.
+11. After merge, verify the merge, issue closure, CI results, and branch cleanup.
+
+Final phase documentation should describe the completed implementation state and identify the next phase before the implementation Pull Request is merged.
+
+Do not create a separate post-merge documentation change solely to mark a phase complete.
 
 ## Recording Progress
 

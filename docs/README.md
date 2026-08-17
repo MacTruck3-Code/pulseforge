@@ -17,10 +17,9 @@ Additional documentation will be added when it provides value, including:
 * Application design
 * Testing strategy
 * Deployment procedures
-* Kubernetes operations
 * Infrastructure management
 * Observability
 * Troubleshooting
 * Reliability practices
 
-These sections are intentionally deferred until their corresponding capabilities exist in the project.
+These sections are intentionally deferred until additional dedicated documentation provides clear value beyond the existing README and architecture guidance.
