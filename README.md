@@ -37,7 +37,7 @@ The repository currently contains:
 * GitHub Actions continuous integration
 * Automated Python testing and code-quality validation
 * Automated container build and runtime validation
-* Automated Kubernetes integration validation with kind
+* Automated Helm and Kubernetes integration validation with kind
 * Informational container vulnerability scanning with Trivy
 
 The existing `pulseforge` command remains a run-to-completion application suitable for Kubernetes Jobs.
@@ -172,7 +172,7 @@ PulseForge can be built and run locally as a Docker container.
 
 The container uses an official Python 3.12 slim base image, installs PulseForge through its Python package configuration, and runs as a dedicated non-root user.
 
-Build the Phase 6 image from the repository root:
+Build the current application image from the repository root:
 
 ```bash
 docker build --tag pulseforge:0.1.0 .

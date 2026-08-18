@@ -57,7 +57,7 @@ Initial CPU and memory requests and limits are configured based on observed loca
 
 ConfigMap and application Secret usage remain deferred because PulseForge does not yet have meaningful non-sensitive runtime configuration or application credentials that require them.
 
-The CI workflow builds the application image, creates an ephemeral kind cluster, loads the local image into the cluster, applies the Kubernetes manifests, and validates the Deployment, Job, and Service behavior.
+The CI workflow validates the Helm chart, creates an ephemeral kind cluster, loads the local image into the cluster, installs the Deployment and Service through Helm, applies the standalone Job, and validates the resulting workload and Service behavior.
 
 Container images are not published to a registry, and Continuous Delivery has not been introduced.
 
@@ -227,9 +227,7 @@ Current CI responsibilities include:
 * Container runtime behavior validation.
 * Non-root runtime verification.
 * Informational Trivy vulnerability scanning.
-* Creation of an ephemeral kind cluster.
-* Loading the locally built PulseForge image into kind.
-* Installing and checksum-validating Helm.
+* Provisioning explicit Helm, kind, and kubectl versions through SHA-pinned setup actions.
 * Running `helm lint`.
 * Rendering the chart with `helm template`.
 * Creating an ephemeral kind cluster.
@@ -269,15 +267,15 @@ Telemetry Collection
 Elastic Stack
 ```
 
-PulseForge now runs locally in Kubernetes using plain manifests.
+PulseForge now runs locally in Kubernetes with the long-running Deployment and Service packaged through Helm and the finite Job maintained as a standalone Kubernetes manifest.
 
-Future phases will package the Kubernetes configuration with Helm, introduce infrastructure management with Terraform when a clear target exists, and add OpenTelemetry and Elastic Stack integration for observability.
+Future phases will introduce infrastructure management with Terraform when a clear target exists and add OpenTelemetry and Elastic Stack integration for observability.
 
 This diagram represents the intended future observability context.
 
 The PulseForge application, container image, and local Kubernetes deployment exist today.
 
-OpenTelemetry instrumentation, telemetry collection, Elastic integration, Terraform-managed infrastructure, Helm packaging, container publishing, and Continuous Delivery have not yet been implemented.
+OpenTelemetry instrumentation, telemetry collection, Elastic integration, Terraform-managed infrastructure, container publishing, and Continuous Delivery have not yet been implemented.
 
 ## Deferred Decisions
 
