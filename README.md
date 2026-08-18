@@ -8,9 +8,9 @@ The goal is not only to build a working application. Each phase is designed to d
 
 ## Current Status
 
-PulseForge has completed **Phase 6: Kubernetes Fundamentals**.
+PulseForge has completed **Phase 7: Helm**.
 
-**Phase 7: Helm** is next.
+**Phase 8: Observability** is next.
 
 The repository currently contains:
 
@@ -27,14 +27,17 @@ The repository currently contains:
 * Automated unit tests with pytest
 * Formatting and linting with Ruff
 * A Docker container running as a dedicated non-root user
-* Plain Kubernetes manifests for a Namespace, Job, Deployment, and Service
+* A standalone Kubernetes Job for finite CLI execution
+* A Helm chart for the long-running Deployment and ClusterIP Service
+* Controlled Helm values for image, replicas, Service port, and resources
+* Helm-managed release installation, upgrades, and uninstall
 * A Kubernetes readiness probe
 * Deliberate CPU and memory requests and limits
 * Local Kubernetes development with kind
 * GitHub Actions continuous integration
 * Automated Python testing and code-quality validation
 * Automated container build and runtime validation
-* Automated Kubernetes integration validation with kind
+* Automated Helm and Kubernetes integration validation with kind
 * Informational container vulnerability scanning with Trivy
 
 The existing `pulseforge` command remains a run-to-completion application suitable for Kubernetes Jobs.
@@ -49,7 +52,7 @@ Container images are built and validated during CI but are not published to a re
 
 ConfigMap and application Secret usage remain intentionally deferred because PulseForge does not yet have meaningful runtime configuration or application credentials that require them.
 
-Helm, Terraform, OpenTelemetry, Elastic integration, container publishing, and continuous delivery have not yet been introduced.
+Terraform, OpenTelemetry, Elastic integration, container publishing, and continuous delivery have not yet been introduced.
 
 These capabilities will continue to be introduced incrementally when they provide clear learning and engineering value.
 
@@ -169,15 +172,15 @@ PulseForge can be built and run locally as a Docker container.
 
 The container uses an official Python 3.12 slim base image, installs PulseForge through its Python package configuration, and runs as a dedicated non-root user.
 
-Build the Phase 6 image from the repository root:
+Build the current application image from the repository root:
 
 ```bash
-docker build --tag pulseforge:phase6 .
+docker build --tag pulseforge:0.1.0 .
 ```
 
 Run the original command-line mode:
 ```bash
-docker run --rm pulseforge:phase6
+docker run --rm pulseforge:0.1.0
 ```
 
 A successful run produces a log message similar to:
@@ -190,7 +193,7 @@ Run the long-running HTTP service:
 ```bash
 docker run --rm \
   --publish 8080:8080 \
-  pulseforge:phase6 serve
+  pulseforge:0.1.0 serve
 ```
 
 Verify the readiness endpoint:
@@ -207,7 +210,7 @@ Verify that the container runs as a non-root user:
 ```bash
 docker run --rm \
   --entrypoint id \
-  pulseforge:phase6
+  pulseforge:0.1.0
 ```
 The reported UID must not be `0`.
 
@@ -229,13 +232,16 @@ The same container image supports both Kubernetes workload models introduced in 
 | [`LICENSE`](LICENSE)                 | Project license                                                             |
 | [`src/pulseforge/`](src/pulseforge/) | Python application package                                                  |
 | [`tests/`](tests/)                   | Automated unit tests                                                        |
-| [`k8s/`](k8s/)                       | Plain Kubernetes manifests for local deployment and validation              |
+| [`k8s/`](k8s/)                       | Standalone Kubernetes manifest for the run-to-completion Job                |
+| [`charts/pulseforge/`](charts/pulseforge/) | Helm chart for the long-running PulseForge Deployment and Service     |
 
 Containerization uses the root-level `Dockerfile` and `.dockerignore`.
 
-Kubernetes deployment configuration is stored under `k8s/` as plain manifests.
+The long-running Kubernetes Deployment and Service are packaged under `charts/pulseforge/`.
 
-Additional deployment and infrastructure directories will be added only when their corresponding phases provide a clear need.
+The standalone run-to-completion Job remains under `k8s/` because it has an explicit lifecycle separate from the Helm release.
+
+The `pulseforge` Namespace is selected during Helm installation and may be created with `--create-namespace`; the Helm chart does not own the Namespace lifecycle.
 
 ## Architecture
 
@@ -243,32 +249,43 @@ PulseForge currently supports both finite command execution and long-running ser
 
 ```text
                     +----------------------+
-                    |   PulseForge Image   |
+                    | PulseForge:0.1.0     |
                     +----------+-----------+
                                |
                  +-------------+-------------+
                  |                           |
                  v                           v
-        Kubernetes Job               Kubernetes Deployment
-          pulseforge                   pulseforge serve
-                                             |
-                                             v
-                                      ClusterIP Service
-                                             |
-                                             v
-                                      /health/ready
+        Kubernetes Job                 Helm Release
+          pulseforge                        |
+                                            v
+                                  Kubernetes Deployment
+                                    pulseforge serve
+                                            |
+                                            v
+                                    ClusterIP Service
+                                            |
+                                            v
+                                     /health/ready
 ```
 
-Local Kubernetes development uses kind and plain manifests stored under `k8s/`.
+Local Kubernetes development uses kind.
+
+The long-running Deployment and Service are managed through the PulseForge Helm chart. The finite CLI Job remains an explicit standalone Kubernetes resource because it should not execute as a side effect of Helm install or upgrade.
+
+Helm exposes only configuration with a legitimate deployment reason to vary: image repository and tag, image pull policy, replica count, Service port, and resource requests and limits.
 
 GitHub Actions independently validates:
+
 * Python behavior and code quality
 * Container build and runtime behavior
-* Kubernetes Job, Deployment, and Service behavior in an ephemeral kind cluster
+* Helm chart linting and rendering
+* Helm installation of the Deployment and Service into an ephemeral kind cluster
+* Standalone Kubernetes Job completion
+* Service readiness through `/health/ready`
 
-The Kubernetes layer intentionally remains small. Helm, Terraform, OpenTelemetry, Elastic integration, container publishing, and Continuous Delivery are deferred to later phases.
+Terraform, OpenTelemetry, Elastic integration, container publishing, and Continuous Delivery remain deferred.
 
-The next architectural expansion is Phase 7: Helm, where the existing plain Kubernetes manifests will provide the baseline for learning reusable deployment packaging and configuration.
+The next architectural expansion is **Phase 8: Observability**.
 
 See the [Architecture Overview](docs/architecture/overview.md) for more detail.
 

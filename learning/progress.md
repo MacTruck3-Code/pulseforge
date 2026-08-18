@@ -8,11 +8,10 @@ It is not intended to be a daily activity log. Entries should capture completed 
 
 | Area | Status |
 |---|---|
-| Most recently completed phase | Phase 6 — Kubernetes Fundamentals |
-| Completion issue | #16 — Establish Kubernetes fundamentals |
-| Completion Pull Request | #17 — Establish Kubernetes fundamentals |
+| Most recently completed phase | Phase 7 — Helm |
+| Completion issue | #18 — Package the Kubernetes deployment with Helm |
 | Phase status | Complete |
-| Next phase | Phase 7 — Helm |
+| Next phase | Phase 8 — Observability |
 
 ## Phase 1 — Repository Foundation
 
@@ -389,6 +388,79 @@ It is not intended to be a daily activity log. Entries should capture completed 
 * Diagnosing Service networking and DNS problems.
 * Maintaining Kubernetes CI as manifests evolve.
 * Understanding when plain manifests become repetitive enough to justify Helm.
+
+## Phase 7 — Helm
+
+### Completed
+
+* Created Issue #18 to define the Phase 7 scope and acceptance criteria.
+* Installed and validated Helm in the local Kubernetes development environment.
+* Created a minimal Helm chart under `charts/pulseforge/`.
+* Added chart metadata, default values, and templates for the long-running Deployment and ClusterIP Service.
+* Preserved `pulseforge serve`, container port `8080`, `/health/ready`, and the existing resource requests and limits.
+* Added standard Helm and Kubernetes labels using chart, release, and application metadata.
+* Used `.Release.Namespace` so the chart can be installed into an explicitly selected namespace.
+* Kept the Namespace outside the Helm release lifecycle and validated that Helm uninstall leaves the namespace intact.
+* Kept the finite `pulseforge` Job outside the Helm release so normal install and upgrade operations do not execute it unexpectedly.
+* Validated the chart with `helm lint` and `helm template`.
+* Installed the chart into the local kind cluster and verified Deployment rollout and Service readiness.
+* Performed a controlled Helm upgrade by changing the replica count and inspected the resulting release revision.
+* Inspected release values, rendered manifests, release history, and Kubernetes resources.
+* Validated Helm uninstall behavior.
+* Retired the duplicated plain Deployment, Service, and Namespace manifests after Helm equivalence was demonstrated.
+* Retained `k8s/job.yml` as the source of truth for the standalone run-to-completion Job.
+* Aligned the local Kubernetes image tag with application version `0.1.0`.
+* Extended Kubernetes CI to lint and render the Helm chart, install the Helm release, validate the standalone Job, and collect Helm diagnostics on failure.
+* Confirmed six pytest tests pass and Ruff formatting and linting remain healthy.
+* Confirmed the container still produces the expected operational behavior and runs as a non-root user.
+
+### Concepts Reinforced
+
+* Helm packages related Kubernetes resources and adds configuration and release lifecycle management without replacing Kubernetes itself.
+* `Chart.yaml` describes the chart, `values.yaml` provides configurable inputs, and templates render Kubernetes resources.
+* `.Chart`, `.Values`, and `.Release` provide different sources of Helm template data.
+* `helm lint` validates chart structure while `helm template` renders resources without installing them.
+* A Helm release records installed configuration and supports revisioned upgrades.
+* Helm upgrades change release desired state while Kubernetes controllers reconcile the resulting resources.
+* Values should represent legitimate deployment variation rather than making every field configurable.
+* Stable selector labels should avoid values such as application version that can change during upgrades.
+* Kubernetes resource lifecycle should determine whether a resource belongs in the same Helm release.
+* Helm release ownership and Kubernetes namespace ownership are separate concerns.
+* ClusterIP Services provide internal cluster networking; `kubectl port-forward` provides temporary developer access from outside the cluster.
+* Maintaining multiple permanent sources of truth for the same Kubernetes resources creates unnecessary drift risk.
+
+### Decisions Made
+
+* Helm manages the long-running Deployment and ClusterIP Service.
+* The standalone run-to-completion Job remains a plain Kubernetes manifest outside Helm.
+* Helm hooks are not used because no legitimate hook lifecycle requirement exists.
+* The chart does not create or own the Kubernetes Namespace.
+* Installations select the namespace explicitly and may use `--create-namespace`.
+* Configurable values are limited to image repository, image tag, image pull policy, replica count, Service port, and resource requests and limits.
+* `pulseforge serve`, container port `8080`, `/health/ready`, and ClusterIP behavior remain fixed application contracts.
+* The Deployment, Service, and Namespace plain manifests were retired after Helm equivalence was validated.
+* Chart version `0.1.0` and application version `0.1.0` currently match but represent independent version concepts.
+* CI validates the same Helm deployment source of truth used locally.
+* Container registry publishing, formal image-release automation, Continuous Delivery, GitOps, and complex environment-specific values remain deferred.
+
+### Challenges
+
+* Deciding which Kubernetes properties should become Helm values required distinguishing genuine deployment configuration from fixed application behavior.
+* The Job required separate lifecycle reasoning because including it in a normal release could cause finite work to execute at unintended times.
+* Updating an existing Kubernetes Job demonstrated that Job Pod templates are immutable and require recreation when their image changes.
+* Helm namespace behavior required distinguishing resources managed by a release from the namespace in which the release is installed.
+* CI initially still referenced the retired plain manifests after Helm became the Deployment and Service source of truth; repository review caught and corrected the mismatch.
+* Understanding Service exposure required separating in-cluster ClusterIP networking from temporary developer access through port forwarding.
+
+### Areas to Reinforce
+
+* Reading and troubleshooting more complex Helm templates.
+* Understanding Helm rollback behavior and release recovery after failed upgrades.
+* Managing chart and application versions as release processes mature.
+* Deciding when environment-specific values files become justified.
+* Understanding when Helm helper templates reduce duplication versus add unnecessary abstraction.
+* Diagnosing Helm and Kubernetes failures using both release metadata and Kubernetes object state.
+* Applying the same lifecycle reasoning as future infrastructure and deployment components are introduced.
 
 ## Future Entries
 

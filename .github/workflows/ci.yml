@@ -85,59 +85,48 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install kind
+      - name: Set up Helm
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2 # v5.0.0
+        with:
+          version: v4.2.4
+
+      - name: Verify Helm
+        run: helm version --short
+
+      - name: Validate Helm chart
         run: |
-          curl --fail --location --show-error --silent \
-            --output kind-linux-amd64 \
-            https://github.com/kubernetes-sigs/kind/releases/download/v0.32.0/kind-linux-amd64
+          helm lint charts/pulseforge
 
-          curl --fail --location --show-error --silent \
-            --output kind-linux-amd64.sha256sum \
-            https://github.com/kubernetes-sigs/kind/releases/download/v0.32.0/kind-linux-amd64.sha256sum
+          helm template pulseforge charts/pulseforge \
+            --namespace pulseforge \
+            > /tmp/pulseforge-rendered.yaml
 
-          sha256sum --check kind-linux-amd64.sha256sum
-
-          chmod +x kind-linux-amd64
-          sudo mv kind-linux-amd64 /usr/local/bin/kind
-
-          kind version
-
-      - name: Install kubectl
-        run: |
-          curl --fail --location --show-error --silent \
-            --output kubectl \
-            https://dl.k8s.io/release/v1.36.3/bin/linux/amd64/kubectl
-
-          curl --fail --location --show-error --silent \
-            --output kubectl.sha256 \
-            https://dl.k8s.io/release/v1.36.3/bin/linux/amd64/kubectl.sha256
-
-          echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
-
-          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-
-          kubectl version --client
+          test -s /tmp/pulseforge-rendered.yaml
 
       - name: Create kind cluster
-        run: |
-          kind create cluster \
-            --name pulseforge-ci \
-            --wait 60s
+        uses: helm/kind-action@ef37e7f390d99f746eb8b610417061a60e82a6cc # v1.14.0
+        with:
+          version: v0.32.0
+          kubectl_version: v1.36.3
+          cluster_name: pulseforge-ci
+          wait: 60s
 
       - name: Build container image
-        run: docker build --tag pulseforge:phase6 .
+        run: docker build --tag pulseforge:0.1.0 .
 
       - name: Load image into kind
         run: |
-          kind load docker-image pulseforge:phase6 \
+          kind load docker-image pulseforge:0.1.0 \
             --name pulseforge-ci
 
-      - name: Apply Kubernetes manifests
+      - name: Install Helm release
         run: |
-          kubectl apply -f k8s/namespace.yml
-          kubectl apply -f k8s/deployment.yml
-          kubectl apply -f k8s/service.yml
-          kubectl apply -f k8s/job.yml
+          helm install pulseforge charts/pulseforge \
+            --namespace pulseforge \
+            --create-namespace
+
+      - name: Create standalone Job
+        run: kubectl apply -f k8s/job.yml
 
       - name: Validate Deployment rollout
         run: |
@@ -180,15 +169,30 @@ jobs:
       - name: Collect Kubernetes diagnostics
         if: failure()
         run: |
+          helm status pulseforge \
+            --namespace pulseforge || true
+
+          helm get values pulseforge \
+            --namespace pulseforge \
+            --all || true
+
+          helm get manifest pulseforge \
+            --namespace pulseforge || true
+
           kubectl get all --namespace pulseforge || true
+
           kubectl get events \
             --namespace pulseforge \
             --sort-by='.lastTimestamp' || true
+          
           kubectl describe deployment pulseforge \
             --namespace pulseforge || true
+          
           kubectl describe job pulseforge \
             --namespace pulseforge || true
+          
           kubectl logs deployment/pulseforge \
             --namespace pulseforge || true
+          
           kubectl logs job/pulseforge \
             --namespace pulseforge || true

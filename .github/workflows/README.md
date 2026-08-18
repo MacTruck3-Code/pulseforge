@@ -64,6 +64,7 @@ Start by identifying which job failed:
 
 * `Python validation` for tests, formatting, linting, or Python setup.
 * `Container validation` for image builds, runtime behavior, non-root validation, or vulnerability scanning.
+* `Kubernetes validation` for Helm chart validation, kind cluster setup, Deployment rollout, standalone Job completion, or Service readiness.
 
 Then open the failed step and review the command output.
 
@@ -139,29 +140,41 @@ This validates the deployable artifact without introducing continuous delivery o
 
 ### Kubernetes Validation
 
-Purpose:
+The workflow validates the Kubernetes deployment model in an ephemeral kind cluster.
 
-* Validate Kubernetes manifests
-* Check manifest formatting and structure
-* Detect common configuration and security issues
+The job:
 
-Add when:
+* Uses SHA-pinned setup actions to provision explicit versions of Helm, kind, and kubectl.
+* Creates the ephemeral kind cluster through the Helm-maintained kind GitHub Action.
+* Runs `helm lint` against the PulseForge chart.
+* Renders the chart with `helm template`.
+* Builds the PulseForge image as `pulseforge:0.1.0`.
+* Loads the local image directly into kind.
+* Installs the Deployment and Service through Helm.
+* Creates the standalone Kubernetes Job from `k8s/job.yml`.
+* Verifies the Deployment reaches its ready state.
+* Verifies the Job completes successfully.
+* Verifies the ClusterIP Service reaches `/health/ready`.
+* Collects Helm release information and Kubernetes diagnostics when validation fails.
 
-* Kubernetes manifests exist
-* Local validation commands have been selected
+The Deployment and Service are validated from the Helm chart because Helm is now their deployment source of truth.
+
+The standalone Job remains a plain Kubernetes manifest because its finite execution lifecycle is intentionally independent from Helm install and upgrade operations.
 
 ### Helm Validation
 
-Purpose:
+Helm validation is part of the Kubernetes validation job.
 
-* Lint the Helm chart
-* Render templates
-* Validate generated Kubernetes resources
+The workflow:
 
-Add when:
+* Runs `helm lint` to detect chart structure and template problems.
+* Runs `helm template` to verify that the chart renders successfully.
+* Installs the chart into the ephemeral kind cluster.
+* Exercises the resulting Deployment and Service through Kubernetes validation.
 
-* A Helm chart exists
-* The chart can be installed successfully in a development environment
+The chart manages the long-running Deployment and ClusterIP Service.
+
+The chart does not manage the Namespace or standalone Job lifecycle.
 
 ### Terraform Validation
 
