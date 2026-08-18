@@ -20,16 +20,17 @@ Python Application
 Docker Image
       ↓
 Local Kubernetes with kind
-      ├─ Job
+      ├─ Standalone Job
       │   └─ pulseforge
       │      → run-to-completion CLI
       │
-      └─ Deployment
-          └─ pulseforge serve
-             ↓
-          Service
-             ↓
-        /health/ready
+      └─ Helm Release
+          ├─ Deployment
+          │   └─ pulseforge serve
+          │
+          └─ ClusterIP Service
+                  ↓
+            /health/ready
 ```
 
 GitHub Actions validates the same major layers independently:
@@ -39,6 +40,9 @@ GitHub Actions CI
       ├─ Python validation
       ├─ Container validation
       └─ Kubernetes validation with kind
+          ├─ Helm lint/render
+          ├─ Helm install
+          └─ Standalone Job validation
 ```
 
 The existing `pulseforge` command remains a run-to-completion process and is used with a Kubernetes Job.
@@ -151,30 +155,52 @@ Phase 6 extended the containerized application into local Kubernetes, using the 
 
 ### Kubernetes — Implemented
 
-PulseForge runs locally on Kubernetes using kind and plain YAML manifests stored under `k8s/`.
+PulseForge runs locally on Kubernetes using kind.
 
 The Kubernetes implementation includes:
 
-* A dedicated `pulseforge` Namespace.
-* A Job for the original run-to-completion `pulseforge` command.
-* A Deployment for the long-running `pulseforge serve` process.
-* A ClusterIP Service that selects the Deployment Pods.
+* A standalone Job for the original run-to-completion `pulseforge` command.
+* A Helm-managed Deployment for the long-running `pulseforge serve` process.
+* A Helm-managed ClusterIP Service that selects the Deployment Pods.
 * A readiness probe using `/health/ready`.
 * CPU and memory requests and limits.
 
-The Deployment uses Kubernetes reconciliation rather than application-level keepalive behavior. When a managed Pod is deleted, the ReplicaSet creates a replacement to restore the desired state.
+The standalone Job remains under `k8s/` because its finite execution lifecycle is intentionally separate from the Helm release.
 
-Readiness determines whether a Pod should receive Service traffic. A failed readiness probe does not restart the container; it removes the unready Pod from eligible Service endpoints.
+The Deployment and Service plain manifests introduced in Phase 6 were retired after Helm equivalence was validated so the repository does not maintain two deployment sources of truth.
 
-A liveness probe is intentionally not configured because PulseForge does not yet have a meaningful failure condition that requires Kubernetes to restart an otherwise running process.
+### Helm — Implemented
 
-ConfigMaps and application Secrets are also intentionally deferred until real runtime configuration or credentials exist.
+PulseForge packages the long-running Kubernetes Deployment and Service in a Helm chart under `charts/pulseforge/`.
 
-Local images are loaded directly into the kind cluster during development and CI. A container registry, external Kubernetes environment, and Continuous Delivery remain deferred.
+The chart contains:
 
-### Helm
+* `Chart.yaml` for chart metadata.
+* `values.yaml` for deliberately configurable deployment values.
+* Templates for the Deployment and Service.
 
-Helm will be introduced when repeated configuration or environment-specific customization makes plain Kubernetes manifests difficult to maintain.
+The chart exposes only configuration with a legitimate reason to vary:
+
+* Image repository.
+* Image tag.
+* Image pull policy.
+* Replica count.
+* Service port.
+* CPU and memory requests.
+* CPU and memory limits.
+
+Application-contract details remain fixed in the templates, including:
+
+* `pulseforge serve`.
+* Container port `8080`.
+* `/health/ready`.
+* ClusterIP Service behavior.
+
+The chart does not manage the Kubernetes Namespace. The namespace is selected during installation and can be created with `--create-namespace`.
+
+The standalone Job is intentionally not part of the Helm release and is not implemented as a Helm hook. This prevents the finite CLI workload from running automatically during normal Helm install or upgrade operations.
+
+Helm release lifecycle behavior was validated through install, upgrade, release inspection, history, and uninstall.
 
 ### Infrastructure as Code
 
@@ -203,11 +229,17 @@ Current CI responsibilities include:
 * Informational Trivy vulnerability scanning.
 * Creation of an ephemeral kind cluster.
 * Loading the locally built PulseForge image into kind.
-* Applying the Kubernetes manifests.
+* Installing and checksum-validating Helm.
+* Running `helm lint`.
+* Rendering the chart with `helm template`.
+* Creating an ephemeral kind cluster.
+* Loading the locally built PulseForge image into kind.
+* Installing the Deployment and Service through Helm.
+* Applying the standalone Kubernetes Job.
 * Verifying the Deployment reaches its ready state.
 * Verifying the Job completes successfully.
 * Verifying the ClusterIP Service reaches `/health/ready`.
-* Collecting Kubernetes workload, Event, description, and log diagnostics when validation fails.
+* Collecting Helm release information and Kubernetes diagnostics when validation fails.
 
 The workflow follows least-privilege repository permissions and pins external GitHub Actions to immutable commit SHAs.
 
@@ -254,7 +286,6 @@ The following decisions are intentionally deferred:
 * Broader application features and domain model
 * Cloud provider or infrastructure platform
 * Container registry
-* Helm chart structure
 * Terraform backend
 * OpenTelemetry Collector topology
 * Elastic deployment model

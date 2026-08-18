@@ -220,7 +220,7 @@ The following practices apply throughout the roadmap:
 | Phase 4 — Containerization              | Complete    |
 | Phase 5 — Continuous Integration        | Complete    |
 | Phase 6 — Kubernetes Fundamentals       | Complete    |
-| Phase 7 — Helm                          | Not started |
+| Phase 7 — Helm                          | Complete    |
 | Phase 8 — Observability                 | Not started |
 | Phase 9 — Elastic Stack Integration     | Not started |
 | Phase 10 — Terraform                    | Not started |
