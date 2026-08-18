@@ -8,6 +8,6 @@ spec:
     spec:
       containers:
         - name: pulseforge
-          image: pulseforge:phase6
+          image: pulseforge:0.1.0
           imagePullPolicy: IfNotPresent
       restartPolicy: Never

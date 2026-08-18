@@ -118,6 +118,39 @@ jobs:
 
           kubectl version --client
 
+      - name: Install Helm
+        run: |
+          curl --fail --location --show-error --silent \
+            --output helm.tar.gz \
+            https://get.helm.sh/helm-v4.2.4-linux-amd64.tar.gz
+
+          curl --fail --location --show-error --silent \
+            --output helm.tar.gz.sha256sum \
+            https://get.helm.sh/helm-v4.2.4-linux-amd64.tar.gz.sha256sum
+
+          sha256sum --check helm.tar.gz.sha256sum
+
+          tar --extract --gzip --file helm.tar.gz
+
+          sudo install \
+            -o root \
+            -g root \
+            -m 0755 \
+            linux-amd64/helm \
+            /usr/local/bin/helm
+
+          helm version --short
+
+      - name: Validate Helm chart
+        run: |
+          helm lint charts/pulseforge
+
+          helm template pulseforge charts/pulseforge \
+            --namespace pulseforge \
+            > /tmp/pulseforge-rendered.yaml
+
+          test -s /tmp/pulseforge-rendered.yaml
+
       - name: Create kind cluster
         run: |
           kind create cluster \
@@ -125,11 +158,11 @@ jobs:
             --wait 60s
 
       - name: Build container image
-        run: docker build --tag pulseforge:phase6 .
+        run: docker build --tag pulseforge:0.1.0 .
 
       - name: Load image into kind
         run: |
-          kind load docker-image pulseforge:phase6 \
+          kind load docker-image pulseforge:0.1.0 \
             --name pulseforge-ci
 
       - name: Apply Kubernetes manifests
@@ -180,15 +213,30 @@ jobs:
       - name: Collect Kubernetes diagnostics
         if: failure()
         run: |
+          helm status pulseforge \
+            --namespace pulseforge || true
+
+          helm get values pulseforge \
+            --namespace pulseforge \
+            --all || true
+
+          helm get manifest pulseforge \
+            --namespace pulseforge || true
+
           kubectl get all --namespace pulseforge || true
+
           kubectl get events \
             --namespace pulseforge \
             --sort-by='.lastTimestamp' || true
+          
           kubectl describe deployment pulseforge \
             --namespace pulseforge || true
+          
           kubectl describe job pulseforge \
             --namespace pulseforge || true
+          
           kubectl logs deployment/pulseforge \
             --namespace pulseforge || true
+          
           kubectl logs job/pulseforge \
             --namespace pulseforge || true
