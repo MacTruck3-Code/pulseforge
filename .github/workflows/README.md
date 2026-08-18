@@ -144,8 +144,8 @@ The workflow validates the Kubernetes deployment model in an ephemeral kind clus
 
 The job:
 
-* Installs pinned versions of kind, kubectl, and Helm.
-* Verifies downloaded CLI binaries before installation.
+* Uses SHA-pinned setup actions to provision explicit versions of Helm, kind, and kubectl.
+* Creates the ephemeral kind cluster through the Helm-maintained kind GitHub Action.
 * Runs `helm lint` against the PulseForge chart.
 * Renders the chart with `helm template`.
 * Builds the PulseForge image as `pulseforge:0.1.0`.

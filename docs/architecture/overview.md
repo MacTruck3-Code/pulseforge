@@ -243,7 +243,7 @@ Current CI responsibilities include:
 
 The workflow follows least-privilege repository permissions and pins external GitHub Actions to immutable commit SHAs.
 
-The kind and kubectl binaries used by Kubernetes validation are also pinned to explicit versions and verified before use.
+Helm, kind, and kubectl are provisioned through SHA-pinned GitHub Actions with explicit tool versions so CI remains reproducible without maintaining custom installation scripts.
 
 Continuous delivery has not yet been implemented.
 
