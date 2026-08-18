@@ -165,12 +165,14 @@ jobs:
           kind load docker-image pulseforge:0.1.0 \
             --name pulseforge-ci
 
-      - name: Apply Kubernetes manifests
+      - name: Install Helm release
         run: |
-          kubectl apply -f k8s/namespace.yml
-          kubectl apply -f k8s/deployment.yml
-          kubectl apply -f k8s/service.yml
-          kubectl apply -f k8s/job.yml
+          helm install pulseforge charts/pulseforge \
+            --namespace pulseforge \
+            --create-namespace
+
+      - name: Create standalone Job
+        run: kubectl apply -f k8s/job.yml
 
       - name: Validate Deployment rollout
         run: |
