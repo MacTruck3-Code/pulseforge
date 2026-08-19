@@ -6,7 +6,7 @@ from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 from starlette.routing import Route
 
-from pulseforge.observability import configure_tracing
+from pulseforge.observability import configure_metrics, configure_tracing
 
 
 async def readiness(request):
@@ -24,6 +24,7 @@ app = Starlette(
 def serve() -> None:
     """Run the PulseForge HTTP service."""
     configure_tracing()
+    configure_metrics()
     StarletteInstrumentor.instrument_app(app)
 
     uvicorn.run(
