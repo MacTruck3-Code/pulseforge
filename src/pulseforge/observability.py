@@ -1,14 +1,13 @@
 """OpenTelemetry configuration for PulseForge."""
 
 from opentelemetry import metrics, trace
+from opentelemetry.exporter.otlp.proto.grpc.metric_exporter import OTLPMetricExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.metrics import MeterProvider
-from opentelemetry.sdk.metrics.export import (
-    ConsoleMetricExporter,
-    PeriodicExportingMetricReader,
-)
+from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import SERVICE_NAME, SERVICE_VERSION, Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 _RESOURCE = Resource.create(
     {
@@ -19,17 +18,17 @@ _RESOURCE = Resource.create(
 
 
 def configure_tracing() -> None:
-    """Configure development tracing for PulseForge."""
+    """Configure tracing export for PulseForge."""
     provider = TracerProvider(resource=_RESOURCE)
-    provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
+    provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
 
     trace.set_tracer_provider(provider)
 
 
 def configure_metrics() -> None:
-    """Configure development metrics for PulseForge."""
+    """Configure metrics export for PulseForge."""
     reader = PeriodicExportingMetricReader(
-        ConsoleMetricExporter(),
+        OTLPMetricExporter(),
         export_interval_millis=5000,
     )
     provider = MeterProvider(

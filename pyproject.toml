@@ -16,6 +16,7 @@ dependencies = [
     "opentelemetry-api>=1.44,<1.45",
     "opentelemetry-sdk>=1.44,<1.45",
     "opentelemetry-instrumentation-starlette>=0.65b0,<0.66",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.44,<1.45",
     "starlette>=1.6,<2",
     "uvicorn>=0.52,<0.53",
 ]
